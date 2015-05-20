@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="JmeSystemRelatorioFornecedorPorCidade" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="79dc85ec-f432-4d6e-b906-cf0e987c11e4">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<parameter name="codigo" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="dataInicial" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="dataFinal" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tipoRelatorio" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     Fornecedor.`FOR_DATA_CADASTRO` AS Fornecedor_FOR_DATA_CADASTRO,
+     Fornecedor.`FOR_RAZAO_SOCIAL` AS Fornecedor_FOR_RAZAO_SOCIAL,
+     Fornecedor.`FOR_CNPJ` AS Fornecedor_FOR_CNPJ,
+     Cidade.`CID_EST_UF` AS Cidade_CID_EST_UF,
+     Cidade.`CID_NOME` AS Cidade_CID_NOME
+FROM
+     `Cidade` Cidade INNER JOIN `Fornecedor` Fornecedor ON Cidade.`CID_ID` = Fornecedor.`FOR_CID_ID`
+WHERE
+     Cidade.`CID_ID` = $P{codigo} AND Fornecedor.`FOR_DATA_CADASTRO`
+Between
+     $P{dataInicial} AND $P{dataFinal}
+OR
+     $P{codigo}='' AND Fornecedor.`FOR_DATA_CADASTRO` Between $P{dataInicial}
+AND
+     $P{dataFinal}]]>
+	</queryString>
+	<field name="Fornecedor_FOR_DATA_CADASTRO" class="java.sql.Date"/>
+	<field name="Fornecedor_FOR_RAZAO_SOCIAL" class="java.lang.String"/>
+	<field name="Fornecedor_FOR_CNPJ" class="java.lang.String"/>
+	<field name="Cidade_CID_EST_UF" class="java.lang.String"/>
+	<field name="Cidade_CID_NOME" class="java.lang.String"/>
+	<group name="Group1">
+		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/15)]]></groupExpression>
+	</group>
+	<group name="Group2">
+		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="60" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="24" uuid="a7334c59-ee58-43d1-88d7-129cb64a2a86"/>
+				<box topPadding="0">
+					<pen lineWidth="0.0" lineStyle="Solid"/>
+					<topPen lineWidth="0.0" lineStyle="Solid"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="2.0" lineStyle="Solid"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="20" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Relatório de Fornecedores]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="40" width="44" height="20" uuid="fdc71b79-0b6c-40f6-bb01-23dcb85c1847"/>
+				<text><![CDATA[Periodo:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="380" y="40" width="52" height="20" uuid="380def9b-ad36-4e5a-bf61-de2815df8325"/>
+				<text><![CDATA[Emitido:]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy HH.mm.ss">
+				<reportElement x="434" y="40" width="121" height="20" uuid="46dcb19b-0f84-4729-9ed2-42000bd58192"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="24" width="44" height="16" uuid="1a724cee-54e5-4a64-8770-2784896de9f4"/>
+				<text><![CDATA[Tipo:]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="44" y="40" width="82" height="20" uuid="447b90a1-5f11-44b9-8845-0616dfa7c305"/>
+				<textElement textAlignment="Center">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{dataInicial}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="126" y="40" width="14" height="20" uuid="de7889e9-92d7-456d-b4d6-2f04e091c93f"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[a]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="140" y="40" width="78" height="20" uuid="5de38e55-28ce-4d8e-95a2-c63df50e5c84"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$P{dataFinal}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="44" y="24" width="174" height="16" uuid="ee32b616-0ced-434a-9af4-5e64030edc17"/>
+				<textFieldExpression><![CDATA[$P{tipoRelatorio}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="107" height="20" uuid="d88cddf8-a624-49a7-a7da-d5299fdb50e8"/>
+				<box leftPadding="1">
+					<topPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DATA CADASTRO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="287" y="0" width="118" height="20" uuid="a2fab672-665b-438c-b67c-ac8fd57656f8"/>
+				<box leftPadding="1">
+					<topPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CNPJ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="525" y="0" width="30" height="20" uuid="759b40bd-dfcf-4121-a48b-eee8408749c5"/>
+				<box leftPadding="1">
+					<topPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[UF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="107" y="0" width="180" height="20" uuid="e12f2e15-3fe2-4a4f-a8c6-7fa31f41d26e"/>
+				<box leftPadding="1">
+					<topPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[RAZÃO SOCIAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="405" y="0" width="120" height="20" uuid="065cf3f6-7b0e-40e1-aae4-784c14a44f8e"/>
+				<box leftPadding="1">
+					<topPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CIDADE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="106" height="20" backcolor="#D1CACA" uuid="5d489a3e-a436-419b-ab14-bab45d0c737c">
+					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) != 0)]]></printWhenExpression>
+				</reportElement>
+			</rectangle>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="0" y="0" width="106" height="20" uuid="22c86a2e-3b64-4fc1-bfd7-0f1611e13118"/>
+				<box leftPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{Fornecedor_FOR_DATA_CADASTRO}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="107" y="0" width="179" height="20" backcolor="#D1CACA" uuid="5789fee9-36cf-41bb-b8fe-59c91f88e366">
+					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) != 0)]]></printWhenExpression>
+				</reportElement>
+			</rectangle>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="107" y="0" width="180" height="20" uuid="ad087f25-2e83-4dd1-96a6-69ae18bff184"/>
+				<box leftPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{Fornecedor_FOR_RAZAO_SOCIAL}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="287" y="0" width="118" height="20" backcolor="#D1CACA" uuid="0410a544-31ac-4a55-aa22-6e6e43a3d6b4">
+					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) != 0)]]></printWhenExpression>
+				</reportElement>
+			</rectangle>
+			<textField>
+				<reportElement x="287" y="0" width="118" height="20" uuid="a7973d98-2669-4650-9329-3d4dd5ad418f"/>
+				<box leftPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{Fornecedor_FOR_CNPJ}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="405" y="0" width="120" height="20" backcolor="#D1CACA" uuid="26384ec6-44c6-4b0c-8e71-d6326418d570">
+					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) != 0)]]></printWhenExpression>
+				</reportElement>
+			</rectangle>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="405" y="0" width="120" height="20" backcolor="#FFFFFF" uuid="b168121f-6aee-4d44-9303-6e00fa98f7ca"/>
+				<box leftPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{Cidade_CID_NOME}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="525" y="0" width="30" height="20" backcolor="#D1CACA" uuid="21cf4af1-4674-4e3a-9584-7dc2065f86e2">
+					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) != 0)]]></printWhenExpression>
+				</reportElement>
+			</rectangle>
+			<textField>
+				<reportElement x="525" y="0" width="30" height="20" uuid="773d83c1-fe22-433e-9789-c4ada2e76f70"/>
+				<box leftPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{Cidade_CID_EST_UF}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="77" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="61" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="74" splitType="Stretch">
+			<textField>
+				<reportElement x="432" y="54" width="80" height="20" uuid="3a6a9e82-8f1b-480e-abc6-491ba7046eed"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Pagina "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="512" y="54" width="40" height="20" uuid="76f44d0a-59e4-4d86-9065-acc55e77c39d"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

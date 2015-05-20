@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<f:event listener="#{MBListagemVendas.carregarListagem()}"
+			type="preRenderView" />
+
+		<h:form id="frmVendasPesquisa">
+			<h:panelGrid columns="5" id="pnlComponentePesquisa" rendered="#{MBListagemVendas.abilitarListagemVenda}">
+				<p:outputLabel value="Data Inicial:" />
+				<p:calendar value="#{MBListagemVendas.filtro.dataInicial}" />
+
+				<p:outputLabel value="Data Final:" />
+				<p:calendar value="#{MBListagemVendas.filtro.dataFinal}" />
+
+				<p:commandButton value="Buscar"
+					actionListener="#{MBListagemVendas.buscar}"
+					update=":msgGlobal :frmVendasPesquisa:tblVendasPesquisa" />
+			</h:panelGrid>
+
+
+			<p:dataTable id="tblVendasPesquisa" widgetVar="tabelaVendas"
+				rendered="#{MBListagemVendas.abilitarListagemVenda}"
+				emptyMessage="Nenhum registro encontrado." var="item"
+				paginator="true" value="#{MBListagemVendas.listagemVendas}"
+				rows="10">
+
+				<f:facet name="header">
+					<h:outputText value="Vendas - Listagem" />
+				</f:facet>
+
+				<p:column exportable="false" headerText="Código">
+					<h:outputText value="#{item.idRegistroVenda}">
+
+					</h:outputText>
+
+				</p:column>
+
+				<p:column exportable="false" headerText="DataVenda">
+					<h:outputText value="#{item.dataVenda}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+
+				</p:column>
+
+				<p:column exportable="false" headerText="Funcionário">
+					<h:outputText value="#{item.funcionario.nome}">
+
+					</h:outputText>
+
+				</p:column>
+
+				<p:column exportable="false" headerText="Cliente">
+					<h:outputText value="#{item.cliente.nome}">
+
+					</h:outputText>
+
+				</p:column>
+
+				<p:column exportable="false" headerText="Valor Total">
+					<h:outputText value="#{item.valorPagar}">
+
+					</h:outputText>
+
+				</p:column>
+
+				<p:column exportable="false" headerText="Opções" style="width: 13%">
+					<p:commandButton icon="ui-icon-info"
+						title="Detalhes da Venda, pagamento, itens, etc."
+						action="#{MBListagemVendas.listagemPagemento}"
+						update=":frmDetalhesVendas:pnlDetalhesVendas :frmDetalhesVendas:tblPagamentos"
+						oncomplete="PF('dlgDetalhesVendas').show();">
+						<f:setPropertyActionListener
+							target="#{MBListagemVendas.vendaCadastro}" value="#{item}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-pencil" title="Editar Venda"
+						action="#{MBListagemVendas.prepararEditar}"
+						update=":frmEditarVenda:wizardEditar :frmVendasPesquisa:pnlComponentePesquisa :frmVendasPesquisa:tblVendasPesquisa :frmVendasPesquisa:txtValor"
+						ajax="false">
+
+						<f:setPropertyActionListener
+							target="#{MBListagemVendas.vendaCadastro}" value="#{item}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-trash" title="Excluir a Venda"
+						oncomplete="PF('dlgExcluirVenda').show();"
+						update=":frmExcluirVenda:pnlExcluirVenda">
+						<f:setPropertyActionListener
+							target="#{MBListagemVendas.vendaCadastro}" value="#{item}" />
+					</p:commandButton>
+
+				</p:column>
+
+			</p:dataTable>
+		</h:form>
+		<p:separator />
+
+		<p:dialog widgetVar="dlgDetalhesVendas" closable="true"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Vendas - Informações">
+
+			<h:form id="frmDetalhesVendas">
+				<h:panelGrid id="pnlDetalhesVendas" columns="2">
+
+					<p:outputLabel value="Codigo:" />
+					<h:outputText
+						value="#{MBListagemVendas.vendaCadastro.idRegistroVenda}" />
+
+					<p:outputLabel value="Forma de Pagamento:" />
+					<h:outputText
+						value="#{MBListagemVendas.vendaCadastro.formaPagamento.descricao}" />
+
+					<p:outputLabel value="Parcela:" />
+					<h:outputText
+						value="#{MBListagemVendas.vendaCadastro.formaPagamento.quantidadeParcela}" />
+
+					<p:outputLabel value="Situação:" />
+					<h:outputText value="#{MBListagemVendas.vendaCadastro.situacao}" />
+
+				</h:panelGrid>
+
+				<p:dataTable emptyMessage="Nenhum registro encontrado."
+					id="tblPagamentos" value="#{MBListagemVendas.pagamento}" var="item">
+
+					<p:column headerText="Data Pagamento">
+						<h:outputText value="#{item.dataPagamento}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Valor">
+						<h:outputText value="R$: #{item.valorPagamento}" />
+					</p:column>
+
+					<p:column headerText="Tipo de Pagamento">
+						<h:outputText value="#{item.tipoFormaPagamento.descricao}" />
+					</p:column>
+
+					<p:column headerText="Situação">
+						<h:outputText value="#{item.registroVendas.situacao}" />
+					</p:column>
+
+				</p:dataTable>
+
+				<p:separator />
+				<h:panelGrid columns="2">
+					<p:commandButton value="Itens"
+						oncomplete="PF('dlgItensVendas').show();"
+						update=":frmItensVenda:tblItens"
+						actionListener="#{MBListagemVendas.buscarItens()}">
+
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgExcluirVenda" closable="true"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Excluir - Venda">
+
+			<h:form id="frmExcluirVenda">
+				<h:panelGrid id="pnlExcluirVenda" columns="2">
+
+					<p:outputLabel value="Responsável pela Venda:" />
+					<h:outputText
+						value="#{MBListagemVendas.vendaCadastro.idRegistroVenda}" />
+
+					<p:outputLabel value="Responsável pela Venda:" />
+					<h:outputText
+						value="#{MBListagemVendas.vendaCadastro.funcionario.nome}" />
+
+					<p:outputLabel value="Cliente:" />
+					<h:outputText
+						value="#{MBListagemVendas.vendaCadastro.cliente.nome}" />
+
+					<p:outputLabel value="Valor Total:" />
+					<h:outputText value="#{MBListagemVendas.vendaCadastro.valorTotal}" />
+
+
+					<p:commandButton value="Excluir"
+						update=":msgGlobal :frmVendasPesquisa:tblVendasPesquisa"
+						actionListener="#{MBListagemVendas.excluir}"
+						oncomplete="PF('dlgExcluirVenda').hide();" />
+				</h:panelGrid>
+
+
+			</h:form>
+
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgItensVendas" closable="true" draggable="false"
+			resizable="false" modal="true" appendTo="@(body)"
+			header="Itens - Informações">
+			<h:form id="frmItensVenda">
+				<p:dataTable id="tblItens" value="#{MBListagemVendas.itensVenda}"
+					emptyMessage="Nenhum registro encontrado." var="item">
+					<p:column headerText="Produto">
+						<h:outputText value="#{item.produto.descricao}" />
+					</p:column>
+
+					<p:column headerText="Quantidade">
+						<h:outputText value="#{item.quantidade}" />
+					</p:column>
+
+					<p:column headerText="Valor Unitário">
+						<h:outputText value="R$ #{item.produto.valorUnitario}" />
+					</p:column>
+
+					<p:column headerText="Valor Total">
+						<h:outputText value="R$ #{item.valorTotalItens}" />
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+		</p:dialog>
+
+		<!-- 		Editar a Venda -->
+
+		<h:form id="frmEditarVenda">
+
+			<!-- 		ABA INICIAL EDIÇÃO DOS ITENS DE VENDA -->
+			<p:wizard id="wizardEditar" nextLabel="Próximo" backLabel="Voltar"
+				rendered="#{MBListagemVendas.abilitarEdicaoVenda}"
+				showStepStatus="false" flowListener="#{MBListagemVendas.handleFlow}">
+				<p:tab id="carrinho" title="Itens - Venda">
+					<p:panel header="Produtos">
+
+						<!-- 					TABELA PRODUTO -->
+						<p:dataTable id="tabelaProdutos"
+							emptyMessage="Nenhum registro encontrado." widgetVar="tblProduto"
+							value="#{MBListagemVendas.produtos}" var="item" paginator="true"
+							rows="3" filteredValue="#{MBRegistroVenda.itensFiltrados}">
+
+							<p:column headerText="ID" filterBy="#{item.idProduto}"
+								sortBy="#{produto.idProduto}">
+								<h:outputText value="#{item.idProduto}" />
+							</p:column>
+							<p:column headerText="COD" filterBy="#{item.codProduto}"
+								sortBy="#{item.codProduto}">
+								<h:outputText value="#{item.codProduto}" />
+							</p:column>
+							<p:column headerText="DESCRIÇÃO" filterBy="#{item.descricao}"
+								sortBy="#{item.descricao}">
+								<h:outputText value="#{item.descricao}" />
+							</p:column>
+
+							<p:column headerText="MODELO" filterBy="#{item.modelo}"
+								sortBy="#{item.modelo}">
+								<h:outputText value="#{item.modelo}" />
+							</p:column>
+							<p:column headerText="MARCA" sortBy="#{item.marca}"
+								filterBy="#{item.marca}">
+								<h:outputText value="#{item.marca}" />
+							</p:column>
+							<p:column headerText="VALOR UNIT." style="width: 6%">
+								<h:outputText value="#{item.valorUnitario}" />
+							</p:column>
+							<p:column headerText="QUANT. ESTOQUE" style="width: 6%">
+								<h:outputText value="#{item.quantEstoque}" />
+							</p:column>
+
+							<p:column headerText="Opções" style="width: 7%">
+
+								<p:commandButton icon="ui-icon-plus" value="Adicionar"
+									title="Adicionar Produto"
+									actionListener="#{MBRegistroVenda.adicionarProduto(item)}">
+								</p:commandButton>
+
+							</p:column>
+
+						</p:dataTable>
+
+						<!-- 						Itens da venda -->
+						<p:panel header="Itens - Venda">
+							<p:dataTable editable="true" id="tblItens"
+								emptyMessage="Nenhum registro encontrado."
+								value="#{MBListagemVendas.itensVenda}" var="item"
+								paginator="true" rows="3">
+
+								<p:column headerText="Produto" style="width: 30%">
+									<h:outputText value="#{item.produto.descricao}" />
+								</p:column>
+
+								<p:column headerText="Modelo" style="width: 20%">
+									<h:outputText value="#{item.produto.modelo}" />
+								</p:column>
+
+								<p:column headerText="Quantidade" style="width: 5%">
+
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{item.quantidade}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:spinner min="1" size="5" maxlength="5"
+												value="#{item.quantidade}" label="Quantidade" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="Valor Unit." style="width: 7%">
+									<h:outputText value="#{item.produto.valorUnitario}" />
+								</p:column>
+
+
+								<p:column headerText="Valor." style="width: 7%">
+									<h:outputText converter="javax.faces.BigDecimal"
+										value="#{item.valorTotalItens}" />
+								</p:column>
+
+								<p:column headerText="Opções" style="width: 6%">
+									<p:commandButton icon="ui-icon-trash" value="Remover"
+										title="Remover Item"
+										actionListener="#{MBRegistroVenda.removerItem(item)}"
+										update=":frmEditarVenda:tblItens :frmEditarVenda:txtValor  " />
+								</p:column>
+
+								<p:column style="width: 3%" headerText="Editar">
+									<p:rowEditor />
+								</p:column>
+
+								<p:ajax immediate="true" event="rowEdit" process="@this"
+									listener="#{MBRegistroVenda.editarItem(item)}"
+									partialSubmit="true"
+									update=":frmEditarVenda:tblItens :frmEditarVenda:txtValor   :msgGlobal" />
+
+							</p:dataTable>
+						</p:panel>
+						<p:separator />
+
+						<center>
+							<h3>
+								<h:outputText id="txtValor"
+									value="Total R$: #{MBListagemVendas.vendaCadastro.valorTotal}" />
+							</h3>
+						</center>
+
+					</p:panel>
+				</p:tab>
+				<p:tab title="Pagamento - Venda">
+					<p:panel header="Detalhes do Venda">
+
+						<!-- 							responsavel pro exibir a mensagem -->
+						<p:growl />
+
+						<h:panelGrid id="pnlFinVenda" columns="4">
+
+							<p:outputLabel for="Cliente" value="Cliente:" />
+							<p:selectOneMenu id="Cliente" filter="true"
+								value="#{MBListagemVendas.vendaCadastro.cliente.idCliente}"
+								required="true" requiredMessage="O campo Cliente é obrigatório">
+
+								<f:selectItem itemLabel="Selecione um cliente" />
+
+								<f:selectItems value="#{MBRegistroVenda.comboCliente}"
+									var="item" itemValue="#{item.idCliente}"
+									itemLabel="#{item.nome}" />
+
+								<p:ajax event="change" listener="#{MBRegistroVenda.confirmacao}"
+									update=":frmEditarVenda:cpf" />
+							</p:selectOneMenu>
+
+							<h:outputText value="CPF:" />
+							<h:inputText id="cpf" disabled="true"
+								value="#{MBListagemVendas.vendaCadastro.cliente.cpf}" />
+
+							<p:outputLabel value="Funcionario:" />
+							<p:outputLabel disabled="true"
+								value="#{MBRegistroVenda.funcionario.nome}" />
+
+
+
+							<h:outputText value="Data Venda" />
+							<h:outputText value="#{MBListagemVendas.vendaCadastro.dataVenda}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</h:outputText>
+
+						</h:panelGrid>
+
+						<p:panel header="Detalhes do Pagamento">
+							<!-- 					responsavel pro exibir a mensagem -->
+							<p:growl />
+							<h:panelGrid columns="2">
+
+								<p:outputLabel for="pagamento" value="Forma de Pagamento:" />
+								<p:selectOneMenu id="pagamento" filter="true"
+									value="#{MBListagemVendas.vendaCadastro.formaPagamento.idFormaPagamento}"
+									required="true"
+									requiredMessage="O campo pagamento é obrigatorio">
+
+									<f:selectItem itemLabel="Selecione uma forma de pagamento" />
+
+									<f:selectItems value="#{MBListagemVendas.comboFormaPagamento}"
+										var="item" itemValue="#{item.idFormaPagamento}"
+										itemLabel="#{item.descricao}" />
+
+									<p:ajax
+										update=":frmEditarVenda:quantidade :frmEditarVenda:valorDescontoAcrescimo :frmEditarVenda:tipoFormaPagamento :msgGlobal"
+										listener="#{MBRegistroVenda.confirmacao}" />
+								</p:selectOneMenu>
+								
+								<p:outputLabel for="tipoFormaPagamento"
+									value="Tipo de Pagamento:" />
+									
+								<p:selectOneMenu id="tipoFormaPagamento" filter="true"
+									disabled="#{MBRegistroVenda.abilitarPagamento}"
+									value="#{MBListagemVendas.pagamento2.tipoFormaPagamento.idTipoFormaPagamento}"
+									required="true"
+									requiredMessage="Tipo de Pagamento é obrigatório">
+
+									<f:selectItem itemLabel="Selecione um tipo de pagamento" />
+
+									<f:selectItems
+										value="#{MBListagemVendas.comboTipoFormaPagamento}" var="item"
+										itemValue="#{item.idTipoFormaPagamento}"
+										itemLabel="#{item.descricao}" />
+
+									<p:ajax listener="#{MBRegistroVenda.confirmacao}" />
+								</p:selectOneMenu>
+
+								<h:outputText value="Desconto/Acréscimo" />
+								<p:selectOneRadio id="descontoAcrescimo"
+									value="#{MBRegistroVenda.tipoAcrescimo}">
+
+									<f:selectItem itemLabel="Desconto" itemValue="0" />
+									<f:selectItem itemLabel="Acréscimo" itemValue="1" />
+
+									<p:ajax listener="#{MBRegistroVenda.calcularDesconto}"
+										update=":frmEditarVenda:valorTotal :frmEditarVenda:valorParcela :msgGlobal" />
+								</p:selectOneRadio>
+
+								<h:outputText value="Valor Desconto/Acréscimo (%)" />
+								<p:spinner id="valorDescontoAcrescimo"
+									value="#{MBRegistroVenda.valorDescontoAcrescimo}"
+									title="Valor do Desconto/Acréscimo" min="0" size="3">
+
+									<p:ajax event="keyup" update=":frmEditarVenda:valorTotal  :msgGlobal"
+										listener="#{MBRegistroVenda.calcularDesconto}" />
+
+									<p:ajax event="change"
+										update=":frmEditarVenda:valorTotal  :msgGlobal"
+										listener="#{MBRegistroVenda.calcularDesconto}" />
+								</p:spinner>
+
+								<h:outputText value="Número de Parcelas" />
+
+								<p:spinner id="quantidade"
+									value="#{MBRegistroVenda.pagamento.numeroParcelas}" min="0"
+									max="#{MBRegistroVenda.quantidadeParcela}" maxlength="3"
+									size="3">
+
+
+									<p:ajax event="change"
+										listener="#{MBRegistroVenda.calcularParcela}"
+										update=":frmEditarVenda:valorParcela :msgGlobal" />
+
+									<p:ajax event="keyup"
+										listener="#{MBRegistroVenda.calcularParcela}"
+										update=":frmEditarVenda:valorParcela :msgGlobal" />
+
+								</p:spinner>
+
+								<h:outputText value="Valor da Parcela:" />
+								<h:outputText converter="javax.faces.Number" id="valorParcela"
+									value="#{MBRegistroVenda.parcela.valor}" />
+
+								<h:outputText value="SubTotal R$:" />
+								<h:outputText id="subTotal" converter="javax.faces.Number"
+									value="#{MBListagemVendas.vendaCadastro.valorTotal}" />
+
+								<h:outputText value="Valor a Pagar R$:" />
+								<h:outputText id="valorTotal" converter="javax.faces.Number"
+									value="#{MBListagemVendas.vendaCadastro.valorPagar}" />
+
+							</h:panelGrid>
+
+							<h:panelGrid columns="4">
+								<h:outputText value="Valor Recebido R$:" />
+								<h:inputText value="#{MBRegistroVenda.valorRecebido}">
+									<p:ajax event="keyup"
+										listener="#{MBRegistroVenda.calcularTroco}"
+										update=":frmEditarVenda:valorVoltar" />
+
+								</h:inputText>
+
+								<h:outputText value="Valor a voltar R$:" />
+								<h:outputText converter="javax.faces.Number" id="valorVoltar"
+									value="#{MBRegistroVenda.valorVoltar}" />
+							</h:panelGrid>
+
+						</p:panel>
+					</p:panel>
+				</p:tab>
+				
+			</p:wizard>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

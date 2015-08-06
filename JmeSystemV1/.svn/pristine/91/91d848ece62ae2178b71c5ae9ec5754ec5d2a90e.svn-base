@@ -1,0 +1,165 @@
+package br.com.jmesystemv1.bean;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+
+import org.apache.poi.ss.formula.ptg.MultiplyPtg;
+
+import com.sun.xml.internal.ws.api.model.SEIModel;
+
+import br.com.jmesystemv1.dao.JmeProdutoDAO;
+import br.com.jmesystemv1.domain.JmeItensVenda;
+import br.com.jmesystemv1.domain.JmeProduto;
+import br.com.jmesystemv1.util.JSFUtil;
+
+/**
+ * 
+ * @author José Wilian
+ * 
+ *         Classe responsável por gerenciar a tela de de Produtos
+ */
+@ManagedBean(name = "MBRegistroVenda")
+@ViewScoped
+public class JmeRegistroVenda implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private List<JmeProduto> itensFiltrados;
+	private List<JmeProduto> listaProdutos;
+	
+	private List<JmeItensVenda> listaItens;
+	
+
+	
+
+	/* =======================GET-SET================= */
+
+	public List<JmeProduto> getListaProdutos() {
+		return listaProdutos;
+	}
+
+	public List<JmeProduto> getItensFiltrados() {
+		return itensFiltrados;
+	}
+
+	public void setItensFiltrados(List<JmeProduto> itensFiltrados) {
+		this.itensFiltrados = itensFiltrados;
+	}
+
+	public void setListaProdutos(List<JmeProduto> listaProdutos) {
+		this.listaProdutos = listaProdutos;
+	}
+
+	public List<JmeItensVenda> getListaItens() {
+		if(listaItens==null){
+			listaItens = new ArrayList<JmeItensVenda>();
+			System.out.println("passou");
+		}
+		
+		return listaItens;
+	}
+
+
+	public void setListaItens(List<JmeItensVenda> listaItens) {
+		this.listaItens = listaItens;
+	}
+
+	/**
+	 * Método responsavel por listar todos os produtos cadastrados
+	 */
+	public void listar() {
+		JmeProdutoDAO dao = new JmeProdutoDAO();
+
+		try {
+
+			listaProdutos = new ArrayList<JmeProduto>();
+
+			listaProdutos = dao.listar();
+
+		} catch (Exception e) {
+			JSFUtil.adicionarMensagemErro("Erro ao listar Pordutos!");
+		}
+	}
+
+	// metodo responsavel por adicionar o produto na tabela de itens
+	public void adicionarProduto(JmeProduto produto) {
+		// porque -1, quando não achar nenhum item corresponde ao produto, pois não achei nenhum produto.
+		int posicaoEncontrada = -1;
+		
+		// posicaoEncontrada<0 que dizer que percorre o vetor até achar o objeto, se achou para o for de executar
+		for (int pos=0; pos <listaItens.size() && posicaoEncontrada<0; pos++) {
+			// vai capturar o item de acordo com a sua posição dentro do vetor
+			JmeItensVenda itemTemporario = listaItens.get(pos);
+			
+			// se o produto do item é igual a produto que veio como paramentro
+			if(itemTemporario.getProduto().equals(produto)){
+				posicaoEncontrada=pos;
+			}
+		}
+		
+		JmeItensVenda itens = new JmeItensVenda();
+		itens.setProduto(produto);
+		
+		// caso não foi encontrado nenhum produto na lista do item, adiciona um novo produto
+		if (posicaoEncontrada < 0){
+			itens.setQuantidade(1);
+			itens.setValorTotalItens(produto.getValorUnitario());
+			listaItens.add(itens);
+			
+			// se achou um produto já na lista do item, soma a quantidade e mutiplica o valor parcial
+		}else{
+				
+			// vai pegar o item que foi encontrado no for.
+			JmeItensVenda itemTemp = listaItens.get(posicaoEncontrada);
+			System.out.println("achou produto igual");
+			itens.setQuantidade(itemTemp.getQuantidade() + 1);
+			itens.setValorTotalItens(produto.getValorUnitario() * (itens.getQuantidade()));
+			
+			listaItens.set(posicaoEncontrada, itens);
+		}
+				
+		
+	}
+	
+	// metodo responsavel por excluir um item da tabela  de item
+	public void removerItem(JmeItensVenda item){
+		listaItens.remove(item);
+	}
+	
+	public void editarItem(JmeItensVenda item){
+		
+//		// porque -1, quando não achar nenhum item corresponde ao produto, pois não achei nenhum produto.
+			int posicaoEncontrada = 0 ;
+				System.out.println(listaItens.size());
+				// posicaoEncontrada<0 que dizer que percorre o vetor até achar o objeto, se achou para o for de executar
+				for (int pos=0; pos <listaItens.size(); pos++) {
+					// vai capturar o item de acordo com a sua posição dentro do vetor
+					JmeItensVenda itemTemporario = listaItens.get(pos);
+					
+					// se o produto do item é igual a produto que veio como paramentro
+					if(itemTemporario.getProduto().equals(item)){
+						posicaoEncontrada=pos;
+						System.out.println(listaItens.size());
+					}
+				}
+		
+				JmeItensVenda editar = new JmeItensVenda();
+				
+				
+				JmeItensVenda itemTemp = listaItens.get(posicaoEncontrada);
+				
+				editar.setProduto(itemTemp.getProduto());
+				editar.setQuantidade(item.getQuantidade());
+				editar.setValorTotalItens(itemTemp.getQuantidade() * itemTemp.getProduto().getValorUnitario());
+				listaItens.set(posicaoEncontrada, editar);
+		
+		
+	}
+
+}

@@ -1,0 +1,122 @@
+package br.com.jmesystemv1.dao;
+
+import java.util.List;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import br.com.jmesystemv1.domain.JmePagamento;
+import br.com.jmesystemv1.util.HibernateUtil;
+import br.com.jmesystemv1.util.JSFUtil;
+
+public class JmePagamentoDAO {
+
+	/** Metodo Salvar */
+	public void salvar(JmePagamento pagamento) {
+		/* Abrindo uma sessão com o banco de dados */
+		Session sessao = HibernateUtil.getSessionFactory().openSession();
+		/* Criando uma transação */
+		Transaction transacao = null;
+
+		try {
+			transacao = sessao.beginTransaction();
+			sessao.save(pagamento);
+			transacao.commit();
+			JSFUtil.adicionarMensagemSucesso("Venda Realizada com Sucesso.");
+		} catch (RuntimeException ex) {
+			/*
+			 * Se transacao for diferente de null, então a transacao e desfeita
+			 * usando o metodo rollback
+			 */
+			if (transacao != null) {
+				transacao.rollback();
+			}
+			throw ex;
+		} finally {
+			sessao.close();
+		}
+	}
+
+	/** Metodo Excluir */
+	public void excluir(JmePagamento pagamento) {
+		Session sessao = HibernateUtil.getSessionFactory().openSession();
+		Transaction transacao = null;
+
+		try {
+			transacao = sessao.beginTransaction();
+			sessao.delete(pagamento);
+			transacao.commit();
+			JSFUtil.adicionarMensagemSucesso("Exclusão Realizada com Sucesso !");
+		} catch (RuntimeException ex) {
+			if (transacao != null) {
+				transacao.rollback();
+			}
+			throw ex;
+		} finally {
+			sessao.close();
+		}
+	}
+
+	/** Metodo Buscar por Codigo */
+	public JmePagamento buscarPorCodigo(Integer idPagamento) {
+		Session sessao = HibernateUtil.getSessionFactory().openSession();
+		JmePagamento pagamento = null;
+
+		try {
+			Query consulta = sessao
+					.getNamedQuery("JmePagamento.buscarPorCodigo");
+			consulta.setInteger("idPagamentor", idPagamento);
+
+			pagamento = (JmePagamento) consulta.uniqueResult();
+
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			sessao.close();
+		}
+
+		return pagamento;
+	}
+
+	/** Metodo Editar */
+	public void editar(JmePagamento pagamento) {
+		Session sessao = HibernateUtil.getSessionFactory().openSession();
+		Transaction transacao = null;
+
+		try {
+			transacao = sessao.beginTransaction();
+			sessao.update(pagamento);
+			transacao.commit();
+
+			JSFUtil.adicionarMensagemSucesso("Cadastro Atualizado com Sucesso !");
+
+		} catch (RuntimeException ex) {
+			if (transacao != null) {
+				transacao.rollback();
+			}
+			throw ex;
+		} finally {
+			sessao.close();
+		}
+	}
+
+	/** Metodo Listar */
+	@SuppressWarnings("unchecked")
+	public List<JmePagamento> listar() {
+		Session sessao = HibernateUtil.getSessionFactory().openSession();
+		List<JmePagamento> pagamento = null;
+
+		try {
+			Query consulta = sessao.getNamedQuery("JmePagamento.listar");
+			pagamento = consulta.list();
+
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			sessao.close();
+		}
+
+		return pagamento;
+	}
+
+}

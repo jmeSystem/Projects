@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<!-- 		Serve para carregar a listagem  preRenderView a função é de antes da tela abrir ele carrega a listagem-->
+		<f:event listener="#{MBFormaPagamento.carregarListagem}"
+			type="preRenderView" />
+
+		<h:form id="frmFormaPagamentoListagem">
+			<p:dataTable id="tblFormaPagamentoListagem"
+				widgetVar="tabelaFormaPagamentoListagem" var="item"
+				emptyMessage="Nenhum registro encontrado."
+				value="#{MBFormaPagamento.listagemFormaPagamento}"
+				filteredValue="#{MBFormaPagamento.itensFiltrados}" paginator="true"
+				rows="7" style="margin-bottom:20px">
+
+				<!-- 				Cabeçalho da tabela -->
+				<f:facet name="header">
+					<h:outputText value="Forma de Pagamento" />
+				</f:facet>
+
+				<!--tirei o heaerText e acrescentei o facet, porque(pois para importa relatorio apartir da pesquisa  
+				eo nome do cabeçalho ser exportado junto, precisei acrescentar a tag f:facet) -->
+				<p:column filterBy="#{item.idFormaPagamento}"
+					sortBy="#{item.idFormaPagamento}">
+					<f:facet name="header">
+						<h:outputText value="Código" />
+					</f:facet>
+					<h:outputText value="#{item.idFormaPagamento}" />
+				</p:column>
+
+				<p:column filterBy="#{item.descricao}" sortBy="#{item.descricao}">
+					<f:facet name="header">
+						<h:outputText value="Descricao" />
+					</f:facet>
+					<h:outputText value="#{item.descricao}" />
+				</p:column>
+
+				<p:column headerText="Desconto" style="width: 20%">
+					<h:outputText value="#{item.desconto} %" />
+				</p:column>
+
+				<p:column headerText="Acréscimo" style="width: 20%">
+					<h:outputText value="#{item.acrescimo} %" />
+				</p:column>
+
+				<p:column headerText="Qtde. Parcela" style="width: 20%">
+					<h:outputText value="#{item.quantidadeParcela}" />
+				</p:column>
+
+				<p:column style="width: 6%" exportable="false" headerText="Opções">
+
+					<p:commandButton icon="ui-icon-pencil" title="Editar"
+						oncomplete="PF('dlgFormaPagamentoEditar').show();"
+						update=":frmFormaPagamentoEditar:pnlFormaPagamentoEditar">
+						<f:setPropertyActionListener
+							target="#{MBFormaPagamento.formaPagamento}" value="#{item}" />
+					</p:commandButton>
+
+				</p:column>
+
+			</p:dataTable>
+		</h:form>
+
+		<p:dialog widgetVar="dlgFormaPagamentoEditar" closable="true"
+			draggable="false" resizable="false" header="Forma Pagamento - Editar"
+			appendTo="@(body)" modal="true">
+			<h:form id="frmFormaPagamentoEditar">
+				<h:panelGrid id="pnlFormaPagamentoEditar" columns="2">
+
+					<p:outputLabel for="descricaoo" value="Descricao:" />
+					<p:outputLabel id="descricaoo"
+						value="#{MBFormaPagamento.formaPagamento.descricao}" size="50"
+						maxlength="40" />
+
+					<p:outputLabel for="descontoo" value="Desconto(%):" rendered="#{MBFormaPagamento.formaPagamento.idFormaPagamento !=2}" />
+					<p:inputText id="descontoo" rendered="#{MBFormaPagamento.formaPagamento.idFormaPagamento !=2}"
+						value="#{MBFormaPagamento.formaPagamento.desconto}" size="3"
+						maxlength="3" title="Digite o valor do desconto" required="true"
+						requiredMessage="O campo desconto é obrigatório" />
+
+					<p:outputLabel for="quantidade" value="Qtde. Parcela:"
+						rendered="#{MBFormaPagamento.formaPagamento.idFormaPagamento!=1}" />
+					<p:inputText id="quantidade" rendered="#{MBFormaPagamento.formaPagamento.idFormaPagamento !=1}"
+						value="#{MBFormaPagamento.formaPagamento.quantidadeParcela}"
+						size="3" maxlength="3" title="Digite a quantidade de parcela" 
+						required="true"
+						requiredMessage="O campo quantidade de parcela é obrigatório"/>
+
+				</h:panelGrid>
+
+				<br />
+				<font color="red"> <h:outputText value="*" />
+				</font>
+				<h:outputLabel value="Indica campo requerido" />
+				<center>
+
+					<p:commandButton value="Editar" icon="ui-icon-check"
+					actionListener="#{MBFormaPagamento.editar}"
+						oncomplete="verificar(xhr, status, args, 'dlgFormaPagamentoEditar', 'tabelaFormaPagamentoListagem' )"
+						update=":frmFormaPagamentoListagem:tblFormaPagamentoListagem :frmFormaPagamentoEditar :msgGlobal" />
+
+					<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+						oncomplete="PF('dlgFormaPagamentoEditar').hide();" ajax="true">
+
+					</p:commandButton>
+
+				</center>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+
+</ui:composition>

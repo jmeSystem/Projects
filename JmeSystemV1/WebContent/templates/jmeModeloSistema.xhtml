@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:p="http://primefaces.org/ui"
+	  >
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>JmeSystem v1</title>
+	<h:outputStylesheet library="css" name="jmeEstilos.css"/>
+	<h:outputStylesheet library="css" name="jmeEstilosPago.css"/>
+	<h:outputStylesheet library="css" name="jmeEstilosPendente.css"/>
+	<h:outputStylesheet library="css" name="jmeEstilosAlerta.css"/>
+	<!-- 	serve para carregar arquivos de javascripts, aonde está a minha regra de campos obrigatórios -->
+	<h:outputScript library="js" name="scripts.js"/>
+	
+	<!-- 	serve para carregar arquivos de javascripts, aonde está a minha regra de campos obrigatórios, crei mais um para deixar o dialog aberto do cadastro -->
+	<h:outputScript library="js" name="scriptsClienteNovo.js"/>
+	
+<!-- 	serve para carregar arquivos de javascripts, para fazer a tradução do calendario em portugues.  -->
+	<h:outputScript library="js" name="scriptsCalendarPortugues.js"/>
+
+<!-- colocar aqui o código -->
+
+</h:head>
+
+<h:body>
+	<p:growl id="msgGlobal" life="6000"/>
+	
+	<p:layout fullPage="true">
+		<p:layoutUnit position="north">
+			<ui:insert name="menu" />
+		</p:layoutUnit>
+		
+		<p:layoutUnit position="center">
+			<ui:insert name="conteudo" />
+		</p:layoutUnit>
+		
+	</p:layout>
+
+</h:body>
+</html>

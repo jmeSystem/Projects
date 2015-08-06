@@ -1,0 +1,146 @@
+package br.com.jmesystemv1.domain;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+/**
+ * @author José Wilian
+ *	Classe responsável por conter os atributos do Produto
+ */
+@Entity
+@Table(name="Produto")
+@NamedQueries({ 
+@NamedQuery(name="JmeProduto.listar", 
+			query="select produto from JmeProduto produto"),
+@NamedQuery(name="JmeProduto.buscarPorCodigo", 
+			query="select produto from JmeProduto produto where pro_id =:idProduto")})
+public class JmeProduto {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name="PRO_ID")
+	private Integer idProduto;
+	
+	/*alterar, somente para teste
+	 * fazer mapeamento OneToMany*/
+	@Column(name="PRO_FOR_ID")
+	private Integer codFornecedor;
+	
+	@Column(name="PRO_COD")
+	private String codProduto;
+	
+	@Column(name="PRO_DESCRICAO")
+	private String descricao;
+	
+	@Column(name="PRO_ESTOQUE_MAX")
+	private Integer estoqueMin;
+	
+	@Column(name="PRO_ESTOQUE_MIN")
+	private Integer estoqueMax;
+	
+	@Column(name="PRO_MODELO")
+	private String modelo;
+	
+	@Column(name="PRO_MARCA")
+	private String marca;
+	
+	@Column(name="PRO_VALOR_UNIT")
+	private Double valorUnitario;
+	
+	@Column(name="PRO_QUANT_ESTOQUE")
+	private Integer quantEstoque;
+	
+	/*================================GET-SET========================*/
+
+	public Integer getIdProduto() {
+		return idProduto;
+	}
+
+	public void setIdProduto(Integer idProduto) {
+		this.idProduto = idProduto;
+	}
+
+	public Integer getCodFornecedor() {
+		return codFornecedor;
+	}
+
+	public void setCodFornecedor(Integer codFornecedor) {
+		this.codFornecedor = codFornecedor;
+	}
+
+	public String getCodProduto() {
+		return codProduto;
+	}
+
+	public void setCodProduto(String codProduto) {
+		this.codProduto = codProduto;
+	}
+
+	public String getDescricao() {
+		return descricao;
+	}
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+
+	public Integer getEstoqueMin() {
+		return estoqueMin;
+	}
+
+	public void setEstoqueMin(Integer estoqueMin) {
+		this.estoqueMin = estoqueMin;
+	}
+
+	public Integer getEstoqueMax() {
+		return estoqueMax;
+	}
+
+	public void setEstoqueMax(Integer estoqueMax) {
+		this.estoqueMax = estoqueMax;
+	}
+
+	public String getModelo() {
+		return modelo;
+	}
+
+	public void setModelo(String modelo) {
+		this.modelo = modelo;
+	}
+
+	public String getMarca() {
+		return marca;
+	}
+
+	public void setMarca(String marca) {
+		this.marca = marca;
+	}
+
+	public Double getValorUnitario() {
+		return valorUnitario;
+	}
+
+	public void setValorUnitario(Double valorUnitario) {
+		this.valorUnitario = valorUnitario;
+	}
+
+	public Integer getQuantEstoque() {
+		return quantEstoque;
+	}
+
+	public void setQuantEstoque(Integer quantEstoque) {
+		this.quantEstoque = quantEstoque;
+	}
+	
+	
+	
+}

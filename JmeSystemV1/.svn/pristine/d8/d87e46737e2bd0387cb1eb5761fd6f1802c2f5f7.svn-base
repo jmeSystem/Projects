@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/jmeModeloSistema.xhtml">
+
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<!-- 		Serve para carregar a listagem  preRenderView a função é de antes da tela abrir ele carrega a listagem-->
+		<f:event listener="#{MBCliente.carregarListagem}" type="preRenderView" />
+
+		<h:form id="frmCliListagem">
+			<p:dataTable  id="tblCliListagem" widgetVar="tabelaCliListagem"
+				value="#{MBCliente.itens}" var="item"
+				emptyMessage="Nenhum registro encontrado." paginator="true" rows="7"
+				filteredValue="#{MBCliente.itensFiltrados}"
+				style="margin-bottom:20px" >
+
+				<!-- 				Cabeçalho da tabela -->
+				<f:facet name="header">
+					<h:outputText value="Cliente - Listagem" />
+				</f:facet>
+
+
+				<!--tirei o heaerText e acrescentei o facet, porque(pois para importa relatorio apartir da pesquisa  
+				eo nome do cabeçalho ser exportado junto, precisei acrescentar a tag f:facet) -->
+				<p:column filterBy="#{item.nome}" sortBy="#{item.nome}">
+ 					<f:facet name="header"> 				   
+						<h:outputText value="Nome" />
+					</f:facet>
+					<h:outputText value="#{item.nome}" />
+				</p:column>
+				
+<!-- 				exporttable="false" serve para quando gerar o relatório apartir dos dados da tabela, que essa coluna, não seja exportada -->
+				<p:column exportable="false" headerText="Endereço">
+					<h:outputText value="#{item.endereco}" />
+				</p:column>
+
+				<p:column  filterBy="#{item.cidade.nome}" sortBy="#{item.cidade.nome}">
+					<f:facet name="header">
+						<h:outputText value="Cidade"/>
+					</f:facet>
+						<h:outputText value="#{item.cidade.nome}" />
+				</p:column>
+
+				<p:column style="width: 0%" exportable="false" headerText="Data Nascimento">
+					<h:outputText value="#{item.dataNascimento}" converter="javax.faces.DateTime"/>
+				</p:column>
+
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="Telefone"/>
+					</f:facet>
+					<h:outputText value="#{item.telefone}" />
+				</p:column>
+
+				<p:column exportable="false" headerText="Data Cadastro" filterBy="#{item.dataCadastro}"
+					sortBy="#{item.dataCadastro}">
+					<h:outputText value="#{item.dataCadastro}"
+						converter="javax.faces.DateTime" />
+				</p:column>
+
+				<p:column filterBy="#{item.cpf}" sortBy="#{item.cpf}">
+					<f:facet name="header">
+						<h:outputText value="CPF"/>
+					</f:facet>
+					<h:outputText value="#{item.cpf}" />
+				</p:column>
+
+				<p:column exportable="false" headerText="Telefone Trabalho">
+					<h:outputText value="#{item.telefoneTrabalho}" />
+				</p:column>
+
+				<p:column exportable="false" headerText="Informações">
+					<h:outputText value="#{item.inforComplementar}" />
+				</p:column>
+
+				<p:column style="width: 6%" exportable="false" headerText="Opções">
+					<p:commandButton icon="ui-icon-trash" title="Excluir"
+						oncomplete="PF('dlgCliExcluir').show();"
+						update=":frmCliExcluir:pnlCliExcluir">
+						<f:setPropertyActionListener target="#{MBCliente.cliente}"
+							value="#{item}" />
+					</p:commandButton>
+
+
+					<p:commandButton icon="ui-icon-pencil" title="Editar"
+						actionListener="#{MBCliente.prepararEditar}"
+						oncomplete="PF('dlgCliEditar').show();"
+						update=":frmCliEditar:pnlCliEditar">
+						<f:setPropertyActionListener target="#{MBCliente.cliente}"
+							value="#{item}" />
+					</p:commandButton>
+
+
+				</p:column>
+
+				<!-- 				Botão novo do cliente -->
+				<f:facet name="footer">
+					<p:commandButton value="Novo" oncomplete="PF('dlgCliNovo').show();" title="Novo: Cliente"
+						actionListener="#{MBCliente.prepararNovo}"
+						update=":frmCliNovo:pnlCliNovo :msgGlobal" />
+
+				</f:facet>
+
+			</p:dataTable>
+			
+<!-- 			imagem que gera a exportação a partir dos dados da tabela -->
+			<h3>Export</h3>
+    		<p:commandLink ajax="false">
+        		<p:graphicImage title="Exportar o resultado para pdf" style="height: 40px" value="/imagens/Adobe_PDF_icon.png" />
+        		<p:dataExporter encoding="iso-8859-1" type="pdf" target="tblCliListagem" fileName="carregarListagem"/>
+    		</p:commandLink>
+    		
+    		<p:commandLink ajax="false">
+        		<p:graphicImage title="Exportar o resultado para excel" style="height: 40px" value="/imagens/excel.png" />
+        		<p:dataExporter type="xls" target="tblCliListagem" fileName="carregarListagem"/>
+    		</p:commandLink>
+    		
+    		<p:commandLink ajax="false">
+        		<p:graphicImage title="Exportar o resultado para csv" style="height: 40px" value="/imagens/csv.png" />
+        		<p:dataExporter type="csv" target="tblCliListagem" fileName="carregarListagem"/>
+    		</p:commandLink>
+    		
+    		<p:commandLink ajax="false">
+        		<p:graphicImage title="Exportar o resultado para xml" style="height: 40px" value="/imagens/xml.png" />
+        		<p:dataExporter type="xml" target="tblCliListagem" fileName="carregarListagem"/>
+    		</p:commandLink>
+
+		</h:form>
+
+		<!-- 			Tela de Inclusão(Dialog) -->
+
+		<p:dialog widgetVar="dlgCliNovo" closable="false" draggable="false"
+			resizable="false" header="Cliente - Novo" appendTo="@(body)"
+			modal="true">
+			<h:form id="frmCliNovo">
+				<h:panelGrid id="pnlCliNovo" columns="2">
+
+					<p:outputLabel for="nomee" value="Nome:"  />
+					<p:inputText id="nomee" value="#{MBCliente.cliente.nome}" size="50"
+						maxlength="40" required="true" title="Digite o nome do cliente"
+						requiredMessage="O campo nome é obrigatório." />
+
+					<p:outputLabel for="endereco" value="Endereço:"  />
+					<p:inputText id="endereco" value="#{MBCliente.cliente.endereco}" title="Digite o endereço"
+						size="50" maxlength="50" required="true"
+						requiredMessage="O campo endereço é obrigatório." />
+
+					<p:outputLabel for="cidade" value="Cidade:" />
+					<p:selectOneMenu id="cidade" 
+						value="#{MBCliente.cliente.cidade.idCidade}" required="true"
+						requiredMessage="O campo cidade é obrigatório.">
+
+						<f:selectItem itemLabel="Selecione uma cidade"/>
+
+						<f:selectItems value="#{MBCliente.comboCidade}" var="item" 
+							itemValue="#{item.idCidade}" itemLabel="#{item.nome}" />
+					</p:selectOneMenu>
+
+
+					<p:outputLabel for="maskDataNascimento" value="Data de Nascimento:" />
+					<p:calendar value="#{MBCliente.cliente.dataNascimento}" title="Exibe o calendário"
+						required="true" showOn="button" locale="pt"
+						requiredMessage="O campo data de nascimento obrigatório."
+						id="maskDataNascimento" pattern="dd/MM/yyyy" mask="true">
+						<p:watermark for="maskDataNascimento" value="30/12/92" />
+					</p:calendar>
+
+					<p:outputLabel for="telefone" value="Telefone:" />
+					<p:inputMask id="telefone" value="#{MBCliente.cliente.telefone}" title="Digite o telefone"
+						size="20" mask="(99) 9999-9999" required="true"
+						requiredMessage="O campo telefone é obrigatório." />
+
+					<p:outputLabel for="maskDataCadastro" value="Data de Cadastro:" />
+					<p:calendar value="#{MBCliente.cliente.dataCadastro}" title="Exibe o calendário"
+						required="true" showOn="button" locale="pt"
+						requiredMessage="O campo dataCadastro é obrigatório."
+						id="maskDataCadastro" pattern="dd/MM/yyyy" mask="true">
+						<p:watermark for="maskDataCadastro" value="19/09/14" />
+					</p:calendar>
+
+					<p:outputLabel for="cpf" value="CPF:" />
+					<p:inputMask title="Digite o CPF" id="cpf" value="#{MBCliente.cliente.cpf}"
+						mask="999.999.999-99" required="true"
+						requiredMessage="O campo cpf é obrigatório." />
+
+					<p:outputLabel for="telefoneTrabalho" value="Telefone do Trabalho:" />
+					<p:inputMask id="telefoneTrabalho" title="Digite o telefone do trabalho"
+						value="#{MBCliente.cliente.telefoneTrabalho}" size="20"
+						mask="(99) 9999-9999" required="true"
+						requiredMessage="O campo telefoneTrabalho é obrigatório" />
+
+					<p:outputLabel value="Informações complementares:" />
+					<p:inputTextarea value="#{MBCliente.cliente.inforComplementar}" title="Digite a informações complementares"
+						rows="5" cols="50" autoResize="false" />
+
+				</h:panelGrid>
+				<!-- 					Botões do cadastro de cliente novo-->
+				<h:panelGrid columns="2">
+					<p:commandButton value="Gravar"
+						actionListener="#{MBCliente.salvar}"
+						oncomplete="verificar2(xhr, status, args, 'dlgCliNovo', 'tabelaCliListagem' )"
+						update=":frmCliListagem:tblCliListagem :frmCliNovo :msgGlobal" />
+
+					<p:commandButton value="Cancelar" process="@this"
+						oncomplete="PF('dlgCliNovo').hide();">
+						<p:resetInput target="pnlCliNovo" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgCliExcluir" appendTo="@(body)" modal="true"
+			closable="false" draggable="false" resizable="false"
+			header="Cliente - Excluir">
+			<h:form id="frmCliExcluir">
+				<h:panelGrid columns="2" id="pnlCliExcluir">
+					<p:outputLabel value="Código" />
+					<h:outputText value="#{MBCliente.cliente.idCliente}" />
+
+					<p:outputLabel value="Nome:" />
+					<h:outputText value="#{MBCliente.cliente.nome}" />
+
+					<p:outputLabel value="Endereço:" />
+					<h:outputText value="#{MBCliente.cliente.endereco}" />
+
+					<p:outputLabel value="Cidade:" />
+					<h:outputText value="#{MBCliente.cliente.cidade.nome}" />
+
+					<p:outputLabel value="Telefone:" />
+					<h:outputText value="#{MBCliente.cliente.telefone}" />
+
+					<p:outputLabel value="Data de Cadastro:" />
+					<h:outputText value="#{MBCliente.cliente.dataCadastro}" />
+
+					<p:outputLabel value="CPF:" />
+					<h:outputText value="#{MBCliente.cliente.cpf}" />
+
+					<p:outputLabel value="Telefone do Trabalho:" />
+					<h:outputText value="#{MBCliente.cliente.telefoneTrabalho}" />
+
+					<p:outputLabel value="Informações complementares:" />
+					<h:outputText value="#{MBCliente.cliente.inforComplementar}" />
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBCliente.excluir}"
+						update=":msgGlobal :frmCliListagem:tblCliListagem"
+						oncomplete="PF('dlgCliExcluir').hide(); tabelaCliListagem.clearFilters();" />
+
+					<p:commandButton value="Cancelar"
+						oncomplete="PF('dlgCliExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgCliEditar" appendTo="@(body)" modal="true"
+			closable="false" draggable="false" resizable="false"
+			header="Cliente - Editar">
+			<h:form id="frmCliEditar">
+				<h:panelGrid columns="2" id="pnlCliEditar">
+					<p:outputLabel for="nomee" value="Nome:" />
+					<p:inputText id="nomee" value="#{MBCliente.cliente.nome}" size="50"
+						maxlength="40" required="true"
+						requiredMessage="O campo nome é obrigatório." />
+
+					<p:outputLabel for="endereco" value="Endereço:" />
+					<p:inputText id="endereco" value="#{MBCliente.cliente.endereco}"
+						size="50" maxlength="50" required="true"
+						requiredMessage="O campo endereço é obrigatório." />
+
+					<p:outputLabel for="cidade" value="Cidade:" />
+					<p:selectOneMenu id="cidade"
+						value="#{MBCliente.cliente.cidade.idCidade}" filter="true"
+						required="true" requiredMessage="O campo cidade é obrigatório.">
+						<f:selectItem itemLabel="Selecione uma cidade" />
+						<f:selectItems value="#{MBCliente.comboCidade}" var="item"
+							itemValue="#{item.idCidade}" itemLabel="#{item.nome}" />
+					</p:selectOneMenu>
+
+
+					<p:outputLabel for="maskDataNascimento" value="Data de Nascimento:" />
+					<p:calendar value="#{MBCliente.cliente.dataNascimento}"
+						required="true"
+						requiredMessage="O campo data de nascimento obrigatório."
+						id="maskDataNascimento" pattern="dd/MM/yyyy" mask="true" />
+
+					<p:outputLabel for="telefone" value="Telefone:" />
+					<p:inputMask id="telefone" value="#{MBCliente.cliente.telefone}"
+						size="20" mask="(99) 9999-9999" required="true"
+						requiredMessage="O campo telefone é obrigatório." />
+
+					<p:outputLabel for="maskDataCadastro" value="Data de Cadastro:" />
+					<p:calendar value="#{MBCliente.cliente.dataCadastro}"
+						required="true"
+						requiredMessage="O campo dataCadastro é obrigatório."
+						id="maskDataCadastro" pattern="dd/MM/yyyy" mask="true" />
+
+					<p:outputLabel for="cpf" value="CPF:" />
+					<p:inputMask id="cpf" value="#{MBCliente.cliente.cpf}"
+						mask="999.999.999-99" required="true"
+						requiredMessage="O campo cpf é obrigatório." />
+
+					<p:outputLabel for="telefoneTrabalho" value="Telefone do Trabalho:" />
+					<p:inputMask id="telefoneTrabalho"
+						value="#{MBCliente.cliente.telefoneTrabalho}" size="20"
+						mask="(99) 9999-9999" required="true"
+						requiredMessage="O campo telefoneTrabalho é obrigatório" />
+
+					<p:outputLabel value="Informações complementares:" />
+					<p:inputTextarea value="#{MBCliente.cliente.inforComplementar}"
+						rows="5" cols="50" autoResize="false" />
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Editar"
+						actionListener="#{MBCliente.editar}"
+						update=":msgGlobal :frmCliListagem:tblCliListagem"
+						oncomplete="verificar(xhr, status, args, 'dlgCliEditar', 'tabelaCliListagem' )" />
+
+					<p:commandButton value="Cancelar" process="@this"
+						oncomplete="PF('dlgCliEditar').hide();">
+						<p:resetInput target="pnlCliEditar" />
+					</p:commandButton>
+				</h:panelGrid>
+
+
+
+			</h:form>
+
+		</p:dialog>
+	</ui:define>
+
+
+</ui:composition>

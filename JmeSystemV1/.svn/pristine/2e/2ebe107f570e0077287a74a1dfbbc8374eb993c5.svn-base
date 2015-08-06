@@ -1,0 +1,147 @@
+package br.com.jmesystemv1.bean;
+
+import java.util.ArrayList;
+import java.util.List;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import br.com.jmesystemv1.dao.JmeProdutoDAO;
+import br.com.jmesystemv1.domain.JmeProduto;
+import br.com.jmesystemv1.util.JSFUtil;
+
+/**
+ * 
+ * @author José Wilian
+ * 
+ *         Classe responsável por gerenciar a tela de de Produtos
+ */
+@ManagedBean(name = "MBProduto")
+@ViewScoped
+public class JmeProdutoBean {
+	
+	private List<JmeProduto> itensFiltrados;
+	private List<JmeProduto> listaProdutos;
+	private JmeProduto produto = new JmeProduto();
+	private JmeProduto produtoSelecionado = new JmeProduto();
+
+	/*
+	 * Método reponsavel por carregar informações na abertura da pagina
+	 */
+	public void init() {
+		
+		this.listar();
+	}
+	/**
+	 * Método Responsavel por preparar para inserir um novo produto
+	 */
+	public void preparaInserirNovo(){
+		
+		produto = new JmeProduto();
+		
+	}
+	
+
+	/*
+	 * Método responsavel por salvar dados no banco
+	 */
+	public void salvar() {
+		JmeProdutoDAO dao = new JmeProdutoDAO();
+
+		try {
+			
+			dao.salvar(produto);
+			JSFUtil.adicionarMensagemSucesso("Produto Inserido com sucesso!");
+		} catch (Exception e) {
+			JSFUtil.adicionarMensagemErro("Erro ao inserir Produto");
+		}
+	}
+	/**
+	 * Método responsavel por listar todos os produtos cadastrados
+	 */
+	public void listar(){
+		JmeProdutoDAO dao = new JmeProdutoDAO();
+		
+		try{
+			
+			listaProdutos = new ArrayList<JmeProduto>();
+			
+			listaProdutos = dao.listar();
+			
+		}catch(Exception e){
+			JSFUtil.adicionarMensagemErro("Erro ao listar Pordutos!");
+		}
+	}
+	/**
+	 * Método Responsavel por excluir um produto selecionado
+	 * */
+	
+	public void exluir(){
+		
+		JmeProdutoDAO dao = new JmeProdutoDAO();
+		
+		try{
+			
+			dao.excluir(produtoSelecionado.getIdProduto());
+			this.listar();
+			
+			JSFUtil.adicionarMensagemSucesso("Excluido com sucesso!!");
+			
+		}catch(Exception e ){
+			JSFUtil.adicionarMensagemErro("Erro ao excluir o produto");
+		}
+		
+	}
+	
+	/***
+	 * Método resposavel por editar um produto
+	 */
+	public void editar(){
+
+		JmeProdutoDAO dao = new JmeProdutoDAO();
+		
+		
+		try{
+			
+			dao.editar(produto);
+			
+			JSFUtil.adicionarMensagemSucesso("Alterado com sucesso!!");
+
+		}catch(Exception e ){
+			JSFUtil.adicionarMensagemErro("Erro ao alterar o produto");
+		}
+		
+		
+	}
+
+	/* =======================GET-SET================= */
+	
+	public List<JmeProduto> getListaProdutos() {
+		return listaProdutos;
+	}
+
+	public List<JmeProduto> getItensFiltrados() {
+		return itensFiltrados;
+	}
+	public void setItensFiltrados(List<JmeProduto> itensFiltrados) {
+		this.itensFiltrados = itensFiltrados;
+	}
+	public void setListaProdutos(List<JmeProduto> listaProdutos) {
+		this.listaProdutos = listaProdutos;
+	}
+
+	public JmeProduto getProduto() {
+		return produto;
+	}
+
+	public void setProduto(JmeProduto produto) {
+		this.produto = produto;
+	}
+
+	public JmeProduto getProdutoSelecionado() {
+		return produtoSelecionado;
+	}
+
+	public void setProdutoSelecionado(JmeProduto produtoSelecionado) {
+		this.produtoSelecionado = produtoSelecionado;
+	}
+	
+}

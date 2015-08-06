@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<!-- 		<f:event listener="#{MBListagemVendas.carregarListagem()}" -->
+		<!-- 			type="preRenderView" /> -->
+
+		<h:form id="frmVendasPesquisa">
+			<h:panelGrid columns="5" id="pnlComponentePesquisa"
+				rendered="#{MBListagemVendas.abilitarListagemVenda}">
+				<p:outputLabel value="Data Inicial:" />
+				<p:calendar id="maskDataInicial"
+					value="#{MBListagemVendas.filtro.dataInicial}" locale="pt"
+					pattern="dd/MM/yyyy" mask="true">
+					<p:watermark for="maskDataInicial" value="19/09/2014" />
+				</p:calendar>
+
+				<p:outputLabel value="Data Final:" />
+				<p:calendar id="maskDataFinal"
+					value="#{MBListagemVendas.filtro.dataFinal}" locale="pt"
+					pattern="dd/MM/yyyy" mask="true">
+					<p:watermark for="maskDataFinal" value="19/09/2014" />
+				</p:calendar>
+
+				<p:commandButton value="Buscar" icon="ui-icon-search"
+					actionListener="#{MBListagemVendas.buscar}"
+					update=":msgGlobal :frmVendasPesquisa:tblVendasPesquisa" />
+			</h:panelGrid>
+
+
+			<p:dataTable editable="true" editMode="cell" id="tblVendasPesquisa"
+				widgetVar="tabelaVendas"
+				filteredValue="#{MBListagemVendas.listaVendasFiltradas}"
+				rendered="#{MBListagemVendas.abilitarListagemVenda}"
+				emptyMessage="Nenhum registro encontrado." var="item"
+				paginator="true" value="#{MBListagemVendas.listagemVendas}"
+				rows="10">
+
+				<f:facet name="header">
+					<h:outputText value="Vendas - Listagem" />
+				</f:facet>
+
+				<p:column exportable="false" headerText="DataVenda">
+					<h:outputText value="#{item.dataVenda}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+
+				</p:column>
+
+				<p:column filterBy="#{item.funcionario.nome}"
+					sortBy="#{item.funcionario.nome}" exportable="false"
+					headerText="Funcionário">
+					<h:outputText value="#{item.funcionario.nome}">
+
+					</h:outputText>
+
+				</p:column>
+
+				<p:column filterBy="#{item.cliente.nome}"
+					sortBy="#{item.cliente.nome}" exportable="false"
+					headerText="Cliente">
+					<h:outputText value="#{item.cliente.nome}">
+
+					</h:outputText>
+
+				</p:column>
+
+				<p:column exportable="false" headerText="Forma de Pagamento">
+					<h:outputText value="#{item.formaPagamento.descricao}">
+
+					</h:outputText>
+
+				</p:column>
+
+				<p:column exportable="false" headerText="Valor da Venda">
+					<h:outputText value="#{item.valorTotal}">
+
+					</h:outputText>
+
+				</p:column>
+
+				<p:column exportable="false" headerText="Desconto">
+					<h:outputText value="#{item.desconto}%">
+
+					</h:outputText>
+
+				</p:column>
+
+				<p:column exportable="false" headerText="Acréscimo">
+					<h:outputText value="#{item.acrescimo}%">
+
+					</h:outputText>
+
+				</p:column>
+
+
+				<p:column exportable="false" headerText="Valor à Pagar">
+					<h:outputText value="R$: #{item.valorPagar}">
+
+					</h:outputText>
+
+				</p:column>
+
+				<p:column exportable="false" filterBy="#{item.situacao}"
+					style="font-weight: bold"
+					styleClass="#{item.situacao=='Pendente' ? 'linhaEstiloPendente' : 'linhaEstiloPago'}"
+					sortBy="#{item.situacao}" headerText="Situação">
+					<h:outputText value="#{item.situacao}">
+
+					</h:outputText>
+				</p:column>
+
+				<p:column exportable="false" headerText="Opções" style="width: 13%">
+					<p:commandButton icon="ui-icon-info"
+						title="Detalhes da Venda, pagamento, itens, etc."
+						action="#{MBListagemVendas.listagemPagamento}"
+						update=" 
+								:frmDetalhesVendas:tblPagamentos 
+								:frmDetalhesVendas:tblParcelas
+								"
+						oncomplete="PF('dlgDetalhesVendas').show();">
+						<f:setPropertyActionListener
+							target="#{MBListagemVendas.vendaCadastro}" value="#{item}" />
+
+
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-pencil" title="Editar Venda"
+						rendered="false" action="#{MBListagemVendas.prepararEditar}"
+						update=":frmEditarVenda:wizardEditar :frmVendasPesquisa:pnlComponentePesquisa 
+						:frmVendasPesquisa:tblVendasPesquisa :frmVendasPesquisa:txtValor"
+						ajax="false">
+
+
+						<f:setPropertyActionListener
+							target="#{MBListagemVendas.vendaCadastro}" value="#{item}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-trash" title="Excluir a Venda"
+						oncomplete="PF('dlgExcluirVenda').show();"
+						update=":frmExcluirVenda:pnlExcluirVenda">
+						<f:setPropertyActionListener
+							target="#{MBListagemVendas.vendaCadastro}" value="#{item}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-print" ajax="false" value="2°. Via"
+						title="imprimir 2°.Via"
+						update=":pnlSegundaVia :tblConfirmacaoItens :tabSegundaVia"
+						actionListener="#{MBListagemVendas.segundaViaVenda(item)}">
+						<f:setPropertyActionListener
+							target="#{MBListagemVendas.vendaCadastro}" value="#{item}" />
+					</p:commandButton>
+
+				</p:column>
+
+			</p:dataTable>
+		</h:form>
+		<p:separator />
+
+		<p:dialog widgetVar="dlgDetalhesVendas" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Vendas - Informações">
+
+			<h:form id="frmDetalhesVendas">
+
+				<p:dataTable emptyMessage="Nenhum registro encontrado."
+					id="tblPagamentos" value="#{MBListagemVendas.listagemPagamento}"
+					var="item">
+
+					<f:facet name="header">
+						<h:outputText value="Pagamentos - Listagem" />
+					</f:facet>
+
+
+					<p:column headerText="Data Pagamento">
+						<h:outputText value="#{item.dataPagamento}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Valor">
+						<h:outputText value="R$: #{item.valorPagamento}" />
+					</p:column>
+
+					<p:column headerText="Tipo de Pagamento">
+						<h:outputText value="#{item.tipoFormaPagamento.descricao}" />
+					</p:column>
+
+					<p:column headerText="Parcela">
+						<h:outputText value="#{item.numeroParcelas}" />
+					</p:column>
+
+					<p:column headerText="Opção">
+						
+
+						<p:commandButton icon="ui-icon-trash" title="Excluir"
+							oncomplete="PF('dlgExcluirPagamentos').show();"
+							update=":frmExcluirPagamentos:pnlExcluirPagamentos">
+							<f:setPropertyActionListener target="#{MBListagemVendas.pagamento}"
+								value="#{item}" />
+								</p:commandButton>
+					</p:column>
+
+
+				</p:dataTable>
+				<p:separator />
+				<p:dataTable emptyMessage="Venda não Parcelada."
+					value="#{MBListagemVendas.listagemParcelas}" id="tblParcelas"
+					var="item">
+
+					<f:facet name="header">
+						<h:outputText value="Parcelas - Listagem" />
+					</f:facet>
+					<p:column headerText="Número da Parcela">
+						<h:outputText value="#{item.numeroParcela}">
+
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Vencimento">
+						<h:outputText value="#{item.dataVencimento}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Atraso">
+						<h:outputText value="#{item.quantidadeDiasAtrasos}"
+							style="font-weight: bold"
+							styleClass="#{item.quantidadeDiasAtrasos>0 ? 'linhaEstiloPendente' : 'linhaEstiloPago'}" />
+
+					</p:column>
+
+
+					<p:column headerText="Valor">
+						<h:outputText value="R$: #{item.valor}">
+
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Valor a Pagar">
+						<h:outputText value="R$: #{item.valorPagar}">
+
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Situação">
+						<h:outputText value="#{item.situacao}" style="font-weight: bold"
+							styleClass="#{item.situacao=='Pendente' ? 'linhaEstiloPendente' : 'linhaEstiloPago'}" />
+					</p:column>
+
+					<p:column headerText="Opção">
+						<p:commandButton value="Pagar" icon="ui-icon-check"
+							rendered="#{item.situacao=='Pendente'}"
+							oncomplete="PF('dlgPagamentos').show();"
+							actionListener="#{MBListagemVendas.prepararPagamento}"
+							update=":frmDetalhesVendas:tblParcelas :pnlPagamentos">
+
+							<f:setPropertyActionListener target="#{MBListagemVendas.parcela}"
+								value="#{item}" />
+
+
+						</p:commandButton>
+					</p:column>
+
+				</p:dataTable>
+
+				<p:separator />
+
+				<h:outputText style="font-weight: bold" value="Instruções:" />
+				<br />
+				<h:outputText value="-Após o vencimento será cobrado multa de 3%" />
+				<br />
+				
+				<h:panelGrid columns="2">
+					<p:commandButton value="Itens" icon="ui-icon-search"
+						oncomplete="PF('dlgItensVendas').show();"
+						update=":frmItensVenda:tblItens" title="Itens da Venda"
+						actionListener="#{MBListagemVendas.buscarItens()}">
+
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgExcluirPagamentos" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Excluir - Pagamento">
+			<h:form id="frmExcluirPagamentos">
+				<h:panelGrid id="pnlExcluirPagamentos" columns="2">
+				
+					<p:outputLabel value="Código da Pagamento:" />
+					<h:outputText value="#{MBListagemVendas.pagamento.idPagamento}"/>
+					
+					<p:outputLabel value="Código da Venda:" />
+					<h:outputText value="#{MBListagemVendas.pagamento.registroVendas.idRegistroVenda}"/>
+					
+					<p:outputLabel value="Número da Parcela:" />
+					<h:outputText value="#{MBListagemVendas.pagamento.numeroParcelas}"/>
+					
+					<p:outputLabel value="Descrição:" />
+					<h:outputText value="#{MBListagemVendas.pagamento.tipoFormaPagamento.descricao}"/>
+					
+					<p:outputLabel value="Data do Pagamento:" />
+					<h:outputText value="#{MBListagemVendas.pagamento.dataPagamento}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+					
+					<p:outputLabel value="Valor Pagamento:" />
+					<h:outputText value="#{MBListagemVendas.pagamento.valorPagamento}"/>
+					
+					
+				</h:panelGrid>
+				
+				<center>
+					<p:commandButton value="Sim" icon="ui-icon-check"
+						title="Excluir o pagamento"
+						update=":msgGlobal :frmDetalhesVendas:tblPagamentos :frmDetalhesVendas:tblParcelas
+							:frmVendasPesquisa:tblVendasPesquisa"
+
+						actionListener="#{MBListagemVendas.excluirPagamento}"
+						oncomplete="PF('dlgExcluirPagamentos').hide();" >
+						<p:resetInput target="pnlExcluirPagamentos" />
+						</p:commandButton>
+
+					<p:commandButton value="Não" icon="ui-icon-closethick"
+						title="Excluir a venda" oncomplete="PF('dlgExcluirPagamentos').hide();" >
+						<p:resetInput target="pnlExcluirPagamentos" />
+						</p:commandButton>
+				</center>
+			</h:form>
+
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgPagamentos" closable="false" draggable="false"
+			resizable="false" modal="true" appendTo="@(body)" header="Pagamento">
+
+			<form id="frmPagamentos">
+				<h:panelGrid id="pnlPagamentos" columns="2">
+
+					<p:outputLabel value="Código da Venda:" />
+					<h:outputText
+						value="#{MBListagemVendas.vendaCadastro.idRegistroVenda}" />
+
+					<p:outputLabel value="Número da Parcela:" />
+					<h:outputText value="#{MBListagemVendas.parcela.numeroParcela}" />
+
+					<p:outputLabel for="teste" value="Forma Pagamento: *" />
+					<p:selectOneMenu id="teste"
+						value="#{MBListagemVendas.pagamento.tipoFormaPagamento.idTipoFormaPagamento}">
+						<f:selectItems value="#{MBListagemVendas.comboTipoFormaPagamento}"
+							var="item" itemValue="#{item.idTipoFormaPagamento}"
+							itemLabel="#{item.descricao}" />
+
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Valor Recebido: *" />
+					<p:inputText required="true"
+						requiredMessage="O valor do pagamento é obrigatório"
+						value="#{MBListagemVendas.pagamento.valorPagamento}" />
+
+
+
+				</h:panelGrid>
+				<br /> <font color="red"> <h:outputText value="*" />
+				</font>
+				<h:outputLabel value="Indica campo requerido" />
+				<center>
+					<p:commandButton value="Efeutar Pagamento" icon="ui-icon-check"
+						action="#{MBListagemVendas.efetuarPagamento}"
+						update=":msgGlobal :frmDetalhesVendas:tblPagamentos :frmDetalhesVendas:tblParcelas 
+						:frmVendasPesquisa:tblVendasPesquisa"
+						oncomplete="PF('dlgPagamentos').hide();">
+						<p:resetInput target="pnlPagamentos" />
+					</p:commandButton>
+
+					<p:commandButton value="Cancelar" process="@this"
+						icon="ui-icon-closethick" oncomplete="PF('dlgPagamentos').hide();">
+						<p:resetInput target="pnlPagamentos" />
+					</p:commandButton>
+				</center>
+			</form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgExcluirVenda" closable="true"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Excluir - Venda">
+
+			<h:form id="frmExcluirVenda">
+				<h:panelGrid id="pnlExcluirVenda" columns="2">
+
+					<p:outputLabel value="Responsável pela Venda:" />
+					<h:outputText
+						value="#{MBListagemVendas.vendaCadastro.funcionario.nome}" />
+
+					<p:outputLabel value="Cliente:" />
+					<h:outputText
+						value="#{MBListagemVendas.vendaCadastro.cliente.nome}" />
+
+					<p:outputLabel value="Valor Total:" />
+					<h:outputText value="#{MBListagemVendas.vendaCadastro.valorTotal}" />
+
+
+
+				</h:panelGrid>
+				<center>
+					<p:commandButton value="Sim" icon="ui-icon-check"
+						title="Excluir a venda"
+						update=":msgGlobal :frmVendasPesquisa:tblVendasPesquisa"
+						actionListener="#{MBListagemVendas.excluir}"
+						oncomplete="PF('dlgExcluirVenda').hide();" />
+
+					<p:commandButton value="Não" icon="ui-icon-closethick"
+						title="Excluir a venda" oncomplete="PF('dlgExcluirVenda').hide();" />
+				</center>
+			</h:form>
+
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgItensVendas" closable="true" draggable="false"
+			resizable="false" modal="true" appendTo="@(body)"
+			header="Itens - Informações">
+			<h:form id="frmItensVenda">
+				<p:dataTable id="tblItens" value="#{MBListagemVendas.itensVenda}"
+					emptyMessage="Nenhum registro encontrado." var="item">
+					<p:column headerText="Produto">
+						<h:outputText value="#{item.produto.descricao}" />
+					</p:column>
+
+					<p:column headerText="Quantidade">
+						<h:outputText value="#{item.quantidade}" />
+					</p:column>
+
+					<p:column headerText="Valor Unitário">
+						<h:outputText value="R$ #{item.produto.valorUnitario}" />
+					</p:column>
+
+					<p:column headerText="Valor Total">
+						<h:outputText value="R$ #{item.valorTotalItens}" />
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+		</p:dialog>
+
+		<p:tab id="tabSegundaVia"
+			rendered="#{MBListagemVendas.abilitarSegundaVia}"
+			title="Venda 2°. Via - imprimir">
+			<p:panel header="Venda - 2°. Via" id="confirmacao">
+
+				<h:panelGrid columns="4" id="pnlSegundaVia">
+					<h:outputText value="Data Venda:" />
+					<h:outputText value="#{MBListagemVendas.vendaCadastro.dataVenda}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+
+					<h:outputText value="Funcionário:" />
+					<h:outputText
+						value=" #{MBListagemVendas.vendaCadastro.funcionario.nome}" />
+
+					<h:outputText value="Cliente:" />
+					<h:outputText
+						value="#{MBListagemVendas.vendaCadastro.cliente.nome}" />
+
+					<h:outputText value="CPF:" />
+					<h:outputText value="#{MBListagemVendas.vendaCadastro.cliente.cpf}" />
+
+					<h:outputText value="Desconto (%):" />
+					<h:outputText value="#{MBListagemVendas.vendaCadastro.desconto}" />
+
+					<h:outputText value="Acréscimo (%):" />
+					<h:outputText value="#{MBListagemVendas.vendaCadastro.acrescimo}" />
+
+					<h:outputText value="SubTotal R$:" />
+					<h:outputText value="#{MBListagemVendas.vendaCadastro.valorTotal}" />
+
+					<h:outputText value="Valor a Pagar:" />
+					<h:outputText value="#{MBListagemVendas.vendaCadastro.valorPagar}" />
+
+					<h:outputText value="QTDE de Parcelas:" />
+					<h:outputText value="#{MBListagemVendas.quantidadeParcela} " />
+
+					<h:outputText value="Valor da Parcela:" />
+					<h:outputText converter="javax.faces.Number"
+						value="#{MBListagemVendas.valorParcela}" />
+
+					<h:outputText value="Tipo de Pagamento:" />
+					<h:outputText
+						value="#{MBRegistroVenda.pagamento.tipoFormaPagamento.descricao}" />
+
+					<h:outputText value="Forma de Pagamento:" />
+					<h:outputText
+						value="#{MBListagemVendas.vendaCadastro.formaPagamento.descricao}" />
+
+				</h:panelGrid>
+
+				<p:separator />
+
+				<h:panelGrid id="Produtos">
+					<p:dataTable value="#{MBListagemVendas.listagemSegundaViaItens}"
+						id="tblConfirmacaoItens" var="item" rows="10">
+
+						<p:column headerText="Produto" style="width: 30%">
+							<h:outputText value="#{item.produto.descricao}" />
+						</p:column>
+
+						<p:column headerText="Modelo" style="width: 20%">
+							<h:outputText value="#{item.produto.modelo}" />
+						</p:column>
+
+						<p:column headerText="Quantidade" style="width: 5%">
+
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{item.quantidade}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:spinner min="1" size="5" maxlength="5"
+										value="#{item.quantidade}" label="Quantidade" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+
+						<p:column headerText="Valor Unit." style="width: 20%">
+							<h:outputText value="#{item.produto.valorUnitario}" />
+						</p:column>
+
+
+						<p:column headerText="Valor." style="width: 7%">
+							<h:outputText converter="javax.faces.BigDecimal"
+								value="#{item.valorTotalItens}" />
+						</p:column>
+
+
+
+					</p:dataTable>
+				</h:panelGrid>
+
+
+
+				<h:panelGrid columns="3">
+					<p:commandButton value="Imprimir 2°.Via" type="button"
+						icon="ui-icon-print">
+						<p:printer target="confirmacao" />
+
+					</p:commandButton>
+				</h:panelGrid>
+			</p:panel>
+
+		</p:tab>
+
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,173 @@
+package br.com.jmesystemv1.relatorio;
+
+
+import java.io.InputStream;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import br.com.jmesystemv1.dao.JmeCidadeDAO;
+import br.com.jmesystemv1.domain.JmeCidade;
+import br.com.jmesystemv1.factory.ConexaoFactory;
+import br.com.jmesystemv1.util.JSFUtil;
+@ManagedBean(name = "MBClienteRelatorio")
+@ViewScoped
+public class relatorioCliente extends HttpServlet {
+
+	private static final long serialVersionUID = 1L;
+	Date dtInicial;
+	Date dtFinal;
+	Integer id;
+	
+	public Date getDtInicial() {
+		return dtInicial;
+	}
+
+	public void setDtInicial(Date dtInicial) {
+		this.dtInicial = dtInicial;
+	}
+
+	public Date getDtFinal() {
+		return dtFinal;
+	}
+
+	public void setDtFinal(Date dtFinal) {
+		this.dtFinal = dtFinal;
+	}
+
+	
+	// vou usar para listar as cidades no combobox
+	private List<JmeCidade> comboCidade;
+	
+	public List<JmeCidade> getComboCidade() {
+		return comboCidade;
+	}
+
+	public void setComboCidade(List<JmeCidade> comboCidade) {
+		this.comboCidade = comboCidade;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+		
+//	// Metodo responsalver para decidir qual relatório que será chamado, dependendo dos campos que foi preenchidos na tela
+//	public void tipoRelatorio(){
+//		// Se o tipo de relatório for todos(obs: itemValue do meu comboBox, set com o valor 0), chama o relatório sem parametro
+//		if(id==0){
+//			this.gerarRelatorioParametro();
+//		// Se não tipo de relatório for por cidade, chama o relatório com paramentro
+//		}else{
+//			this.gerarRelatorioParametro();
+//		}
+//	}
+	
+	// preparar novo funciona para carregar o combobox da pagina relatorioCliente
+	public void prepararNovo(){
+	try{
+		
+		JmeCidadeDAO dao = new JmeCidadeDAO();
+		comboCidade =  dao.listar();
+		System.out.print("passou preparar Novo");
+		}catch(Exception ex){
+			ex.printStackTrace();
+			JSFUtil.adicionarMensagemErro(ex.getMessage());
+		}
+	}	
+	
+	// metodo responsavel para gerarRelatório de clientes sem paramentros.
+//	public void gerarRelatorioComum() {
+//		System.out.print("passou no gerarRelatorioComum");
+//		try {
+//			
+//			// mudei o caminho para Cliente.jasper, pois será responsavel de pegar o relatório ja compilado (obs: tirei do pacote o relatorio Cliente.jrxml)
+//			InputStream caminho = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/relatorios/Cliente.jasper");
+////			toda vez que chama o relatório estava compilando, tirei pois passei o caminho do relatório no JasperPrint
+////			JasperReport report = JasperCompileManager.compileReport(caminho);
+//
+//			// aonde está null, é aonde fica os parametros
+//			JasperPrint print = JasperFillManager.fillReport(caminho, null,
+//					ConexaoFactory.conectar());
+//
+//			
+//			byte[] bytes = JasperExportManager.exportReportToPdf(print);
+//			if (bytes != null) {
+//				HttpServletResponse response = JSFUtil.getResponse();
+//				response.setContentType("application/pdf");
+//				// Nome do relatório que será gerado
+//				response.setHeader("Content-disposition","attachment;filename=ListagemClientes.pdf");
+//				response.setContentLength(bytes.length);
+//				response.getOutputStream().write(bytes, 0, bytes.length);
+//				response.getOutputStream().flush();
+//				response.flushBuffer();
+//				JSFUtil.responseComplete();		
+//				JasperExportManager.exportReportToPdf(print);
+//				//abre o relatorio direito
+//				//JasperViewer.viewReport(print, false);
+//				this.prepararNovo();
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
+	
+	// metodo responsavel para gerar relatório por cidade
+	public void gerarRelatorioParametro() {
+		System.out.print("passou no relatorio com paramentro");
+		
+		// responsalvel para setar o valor do paramentro
+		Map<String, Object> hm = new HashMap<String, Object>();
+
+		try {	
+			
+			//CidId, É O NOME DA VARIAVEL QUE PASSEI COMO PARAMETRO NO IREPORT.
+			hm.put("CidId", id);
+			//Diretório do caminho, modifiquei para .jasper a extenção do meu caminho, pois tinha que compilava toda vez o relatório
+			InputStream caminho = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/relatorios/Cliente.jasper");
+			
+			
+//			//compilava toda vez o relatório quando fosse chamado, por isso que tirei
+//			JasperReport report = JasperCompileManager.compileReport(caminho);
+			
+			// coloquei meu caminho como paramentro
+			JasperPrint print = JasperFillManager.fillReport(caminho, hm,
+					ConexaoFactory.conectar());
+			// Responsalvel para exportar o arquivo em pdf
+			byte[] bytes = JasperExportManager.exportReportToPdf(print);
+			
+			if (bytes != null) {
+				 HttpServletResponse response = JSFUtil.getResponse();
+				 response.setContentType("application/pdf");
+				 // Nome do relatório que será gerado
+				 response.setHeader("Content-disposition","attachment;filename=RelatorioCliente.pdf");
+				 response.setContentLength(bytes.length);
+				 response.getOutputStream().write(bytes, 0, bytes.length);
+				 response.getOutputStream().flush();
+				 response.flushBuffer();
+				 JSFUtil.responseComplete();
+//				 Abre o relatório direto, mais esse comando é usando para sistema Desktop
+//				 JasperViewer.viewReport(print, false);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+
+	}
+

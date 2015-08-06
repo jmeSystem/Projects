@@ -1,0 +1,90 @@
+package br.com.jmesystemv1.domain;
+
+import sun.util.calendar.LocalGregorianCalendar.Date;
+
+
+public class JmeFornecedor {
+	
+	private Integer idFornecedor;
+	private Date dataCadastro;
+	private String razaoSocial;
+	private String cnpj;
+	private String nomeFantasia;
+	private String telefoneFixo;
+	private String email;
+	private String endereco;
+	private String cep;
+	private String caixaPostal;
+	private JmeCidade cidade;
+	
+	
+	public Integer getIdFornecedor() {
+		return idFornecedor;
+	}
+	public void setIdFornecedor(Integer idFornecedor) {
+		this.idFornecedor = idFornecedor;
+	}
+	public Date getDataCadastro() {
+		return dataCadastro;
+	}
+	public void setDataCadastro(Date dataCadastro) {
+		this.dataCadastro = dataCadastro;
+	}
+	public String getRazaoSocial() {
+		return razaoSocial;
+	}
+	public void setRazaoSocial(String razaoSocial) {
+		this.razaoSocial = razaoSocial;
+	}
+	public String getCnpj() {
+		return cnpj;
+	}
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
+	}
+	public String getNomeFantasia() {
+		return nomeFantasia;
+	}
+	public void setNomeFantasia(String nomeFantasia) {
+		this.nomeFantasia = nomeFantasia;
+	}
+	public String getTelefoneFixo() {
+		return telefoneFixo;
+	}
+	public void setTelefoneFixo(String telefoneFixo) {
+		this.telefoneFixo = telefoneFixo;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getEndereco() {
+		return endereco;
+	}
+	public void setEndereco(String endereco) {
+		this.endereco = endereco;
+	}
+	public String getCep() {
+		return cep;
+	}
+	public void setCep(String cep) {
+		this.cep = cep;
+	}
+	public String getCaixaPostal() {
+		return caixaPostal;
+	}
+	public void setCaixaPostal(String caixaPostal) {
+		this.caixaPostal = caixaPostal;
+	}
+	public JmeCidade getJmeCidade() {
+		return cidade;
+	}
+	public void setJmeCidade(JmeCidade cidade) {
+		this.cidade = cidade;
+	}
+	
+	
+
+}

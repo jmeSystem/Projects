@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+			<!-- 		Serve para carregar a listagem  preRenderView a função é de antes da tela abrir ele carrega a listagem do comboBox-->
+		<f:event listener="#{MBClienteRelatorio.prepararNovo}" type="preRenderView" />
+			
+			<h:form>
+				<p:panel header="Relatório - Clientes">
+				<h:panelGrid  id="pnlRelatorioCliente" columns="2">
+					<p:outputLabel for="cidade" value="Cidade:" />
+					<p:selectOneMenu id="cidade"
+						value="#{MBClienteRelatorio.id}" required="true"
+						requiredMessage="O campo cidade é obrigatório.">
+
+						<f:selectItem itemValue="0" itemLabel="Todos" />
+
+						<f:selectItems value="#{MBClienteRelatorio.comboCidade}" var="item"
+							itemValue="#{item.idCidade}" itemLabel="#{item.nome}" />
+					</p:selectOneMenu>
+					
+				</h:panelGrid>
+				
+				<h:panelGrid columns="10">
+						<p:outputLabel value="Dt Inicial:"/>
+						<p:calendar value="#{MBClienteRelatorio.dtInicial}" title="Exibe o calendário"
+						required="true" showOn="button"
+						
+						id="maskDataInicial" pattern="dd/MM/yyyy" mask="true">
+						<p:watermark for="maskDataInicial" value="30-12-92" />
+						</p:calendar>
+											
+					<p:outputLabel value="Dt Final:"/>
+					<p:calendar value="#{MBClienteRelatorio.dtFinal}" title="Exibe o calendário"
+						required="true" showOn="button"
+						
+						id="maskDataFinal" pattern="dd/MM/yyyy" mask="true">
+						<p:watermark for="maskDataFinal" value="30-12-92" />
+						</p:calendar>
+					
+				
+				</h:panelGrid>
+				
+<!-- 				Painel grid dos botões -->
+				<h:panelGrid columns="1">
+					<p:commandButton ajax="false" value="Gerar Relatório"
+						actionListener="#{MBClienteRelatorio.gerarRelatorioParametro}"/>
+				</h:panelGrid>
+				</p:panel>
+			</h:form>	
+	</ui:define>
+</ui:composition>

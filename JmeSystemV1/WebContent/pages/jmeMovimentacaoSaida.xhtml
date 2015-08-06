@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<!-- 		Serve para carregar a listagem  preRenderView a função é de antes da tela abrir ele carrega a listagem-->
+		<f:event listener="#{MBMovimentacaoSaida.carregarListagem}"
+			type="preRenderView" />
+
+		<h:form id="frmMovSaidaListagem">
+		
+				
+			<p:dataTable id="tblMovSaidaListagem"
+				widgetVar="tabelaMovSaidaListagem" var="item"
+				emptyMessage="Nenhum registro encontrado."
+				value="#{MBMovimentacaoSaida.listagemItens}"
+				filteredValue="#{MBMovimentacaoSaida.itensFiltrados}"
+				paginator="true" rows="7" style="margin-bottom:20px">
+
+				<!-- 				Cabeçalho da tabela -->
+				<f:facet name="header">
+					<h:outputText value="Saída de Produtos - Listagem" />
+				</f:facet>
+
+				<!--tirei o heaerText e acrescentei o facet, porque(pois para importa relatorio apartir da pesquisa  
+				eo nome do cabeçalho ser exportado junto, precisei acrescentar a tag f:facet) -->
+				<p:column sortBy="#{item.registroVendas.dataVenda}">
+					<f:facet name="header">
+						<h:outputText value="Data Saída" />
+					</f:facet>
+					<h:outputText value="#{item.registroVendas.dataVenda}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				
+				<p:column filterBy="#{item.produto.codProduto}"
+					sortBy="#{item.produto.codProduto}">
+					<f:facet name="header">
+						<h:outputText value="Código Produto" />
+					</f:facet>
+					<h:outputText value="#{item.produto.codProduto}" />
+				</p:column>
+				
+
+				<p:column filterBy="#{item.produto.descricao}"
+					sortBy="#{item.produto.descricao}">
+					<f:facet name="header">
+						<h:outputText value="Produto" />
+					</f:facet>
+					<h:outputText value="#{item.produto.descricao}" />
+				</p:column>
+
+				<p:column  sortBy="#{item.produto.quantidade}">
+					<f:facet name="header">
+						<h:outputText value="Quantidade" />
+					</f:facet>
+					<h:outputText value="#{item.quantidade}" />
+				</p:column>
+
+
+			</p:dataTable>
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

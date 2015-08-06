@@ -1,0 +1,35 @@
+package br.com.jmesystemv1.dao;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import br.com.jmesystemv1.domain.JmeParcela;
+import br.com.jmesystemv1.util.HibernateUtil;
+import br.com.jmesystemv1.util.JSFUtil;
+
+public class JmeParcelaDAO {
+
+	public void salvar(JmeParcela parcela){
+	// pegar uma sessão para conseguir fazer as operações no banco de dados
+
+			Session sessao = HibernateUtil.getSessionFactory().openSession();
+			Transaction transacao = null; // quando for start a transação pode dar
+											// erro
+
+			try {
+
+				transacao = sessao.beginTransaction();
+				sessao.save(parcela);
+				transacao.commit(); // confirma a transação
+				
+			} catch (RuntimeException ex) {
+				// se for diferente de null e desfaz toda trasação
+				if (transacao != null) {
+					transacao.rollback();// desfazer toda a transação
+				}
+
+			} finally {
+				sessao.close();
+			}
+		}
+}

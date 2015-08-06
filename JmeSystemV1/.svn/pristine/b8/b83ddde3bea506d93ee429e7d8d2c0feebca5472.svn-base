@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<f:event listener="#{MBRegistroVenda.listar}" type="preRenderView" />
+
+		<h:form id="frmVenda">
+			<p:panel header="Vendas">
+				<p:dataTable id="tabelaProdutos"
+					emptyMessage="Nenhum registro encontrado." widgetVar="tblProduto"
+					value="#{MBRegistroVenda.listaProdutos}" var="item"
+					paginator="true" rows="3"
+					filteredValue="#{MBRegistroVenda.itensFiltrados}">
+
+					<p:column headerText="ID" filterBy="#{item.idProduto}"
+						sortBy="#{produto.idProduto}">
+						<h:outputText value="#{item.idProduto}" />
+					</p:column>
+					<p:column headerText="COD" filterBy="#{item.codProduto}"
+						sortBy="#{item.codProduto}">
+						<h:outputText value="#{item.codProduto}" />
+					</p:column>
+					<p:column headerText="DESCRIÇÃO" filterBy="#{item.descricao}"
+						sortBy="#{item.descricao}">
+						<h:outputText value="#{item.descricao}" />
+					</p:column>
+
+					<p:column headerText="MODELO" filterBy="#{item.modelo}"
+						sortBy="#{item.modelo}">
+						<h:outputText value="#{item.modelo}" />
+					</p:column>
+					<p:column headerText="MARCA" sortBy="#{item.marca}"
+						filterBy="#{item.marca}">
+						<h:outputText value="#{item.marca}" />
+					</p:column>
+					<p:column headerText="VALOR UNIT." style="width: 6%">
+						<h:outputText value="#{item.valorUnitario}" />
+					</p:column>
+					<p:column headerText="QUANT. ESTOQUE" style="width: 6%">
+						<h:outputText value="#{item.quantEstoque}" />
+					</p:column>
+
+					<p:column headerText="Opções" style="width: 6%">
+
+						<p:commandButton value="Adicionar" title="Adicionar Produto"
+							actionListener="#{MBRegistroVenda.adicionarProduto(item)}"
+							update=":frmVenda:tblItens" />
+
+					</p:column>
+
+				</p:dataTable>
+			</p:panel>
+
+			<p:separator />
+
+
+			<p:dataTable editable="true" id="tblItens"
+				emptyMessage="Nenhum registro encontrado."
+				value="#{MBRegistroVenda.listaItens}" var="item" paginator="true"
+				rows="2">
+
+				<p:column headerText="Produto" style="width: 30%">
+					<h:outputText value="#{item.produto.descricao}" />
+				</p:column>
+				
+				<p:column headerText="Modelo" style="width: 20%">
+					<h:outputText value="#{item.produto.modelo}"/>
+				</p:column>
+
+				<p:column headerText="Quantidade" style="width: 5%">
+
+					<p:cellEditor>
+						<f:facet name="output" >
+							<h:outputText value="#{item.quantidade}" />
+						</f:facet>
+						<f:facet name="input" >
+							<p:inputText size="5" maxlength="5" value="#{item.quantidade}" 
+								label="Quantidade" />
+						</f:facet>
+
+					</p:cellEditor>
+				</p:column>
+
+				<p:column headerText="Valor Unit." style="width: 7%">
+					<h:outputText  value="#{item.produto.valorUnitario}"/>
+				</p:column>
+
+
+				<p:column headerText="Valor." style="width: 7%">
+					<h:outputText converter="javax.faces.BigDecimal"
+						value="#{item.valorTotalItens}" />
+				</p:column>
+
+				<p:column headerText="Opções" style="width: 5%">
+					<p:commandButton value="Remover" title="Remover Item"
+						actionListener="#{MBRegistroVenda.removerItem(item)}"
+						update=":frmVenda:tblItens" />
+				</p:column>
+
+				<p:column style="width: 3%">
+					<p:rowEditor/>
+				</p:column>
+
+				<p:ajax event="rowEdit" 
+					listener="#{MBRegistroVenda.editarItem(item)}"
+					update=":frmVenda:tblItens" />
+
+			</p:dataTable>
+
+		</h:form>
+
+
+
+	</ui:define>
+
+</ui:composition>

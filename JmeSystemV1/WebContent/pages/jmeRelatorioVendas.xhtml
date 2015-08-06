@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<!-- 		Serve para carregar a listagem  preRenderView a função é de antes da tela abrir ele carrega a listagem do comboBox-->
+		<f:event listener="#{MBRelatorioVendas.carregarListagem}"
+			type="preRenderView" />
+
+		<h:form id="frmRelatorioVendas">
+			<center>
+				<p:panel header="Relatório - Vendas">
+
+					<h:panelGrid columns="4" id="pnlRelatorioVendas">
+						<p:outputLabel value="Data da Venda:" />
+						<p:calendar locale="pt" value="#{MBRelatorioVendas.dataInicial}"
+							title="Intervalo Inicial: Data da venda" showOn="button"
+							id="maskDataInicial" pattern="dd/MM/yyyy" mask="true">
+							<p:watermark for="maskDataInicial" value="30/12/1992" />
+						</p:calendar>
+
+						<p:outputLabel value="a" />
+
+						<p:calendar locale="pt" value="#{MBRelatorioVendas.dataFinal}"
+							title="Intervalo Final: Data da venda" showOn="button"
+							id="maskDataFinal" pattern="dd/MM/yyyy" mask="true">
+							<p:watermark for="maskDataFinal" value="30/12/1992" />
+						</p:calendar>
+
+
+						<p:outputLabel for="produto" value="Produto:" />
+						<p:selectOneMenu id="produto" filter="true"
+							value="#{MBRelatorioVendas.idProduto}">
+
+							<f:selectItem itemValue="0" itemLabel="TODOS" />
+
+							<f:selectItems value="#{MBRelatorioVendas.comboProduto}"
+								var="item" itemValue="#{item.idProduto}"
+								itemLabel="#{item.codProduto} - #{item.descricao}" />
+
+							<p:ajax listener="#{MBRelatorioVendas.abilitarCampo}"
+								update=":frmRelatorioVendas:funcionario" />
+						</p:selectOneMenu>
+
+						<p:outputLabel />
+						<p:outputLabel />
+
+
+						<p:outputLabel value="Funcionário:" />
+						<p:selectOneMenu filter="true" id="funcionario"
+							disabled="#{MBRelatorioVendas.abilitarCombo}"
+							value="#{MBRelatorioVendas.idFuncionario}">
+
+							<f:selectItem itemValue="0" itemLabel="TODOS" />
+
+							<f:selectItems value="#{MBRelatorioVendas.comboFuncionario}"
+								var="item" itemValue="#{item.idFuncionario}"
+								itemLabel="#{item.nome}" />
+						</p:selectOneMenu>
+
+						<p:outputLabel />
+						<p:outputLabel />
+
+						<p:outputLabel value="Tipo Relatório" />
+						<p:selectOneMenu filter="true"
+							value="#{MBRelatorioVendas.tipoRelatorio}">
+
+							<f:selectItem itemValue="1" itemLabel="1 - NORMAL" />
+							<f:selectItem itemValue="2" itemLabel="2 - GRÁFICO EM BARRAS" />
+							<f:selectItem itemValue="3" itemLabel="3 - GRÁFICO DE PIZZA" />
+							
+						</p:selectOneMenu>
+
+					</h:panelGrid>
+
+
+					<h:panelGrid columns="1">
+						<p:commandButton ajax="false" value="Gerar Relatório"
+							actionListener="#{MBRelatorioVendas.validacaoRelatorio()}" />
+					</h:panelGrid>
+
+				</p:panel>
+			</center>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

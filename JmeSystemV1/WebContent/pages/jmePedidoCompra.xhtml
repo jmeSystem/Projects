@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+
+
+	<ui:define name="conteudo">
+
+		<f:event listener="#{MBPedidoCompra.listagem()}" type="preRenderView" />
+
+
+		<h:form id="frmPedido">
+			<p:wizard>
+				<p:tab id="pedido" title="Pedido">
+					<p:dataTable id="tblPedidoCompra" widgetVar="tabelaPedidoCompra"
+						emptyMessage="Nenhum registro encontrado..."
+						value="#{MBPedidoCompra.listaProdutos}" var="produto"
+						filteredValue="#{MBPedidoCompra.listaProdutosFiltrados}"
+						paginator="true" rows="3">
+
+						<f:facet name="header">
+	  					PRODUTOS EM ESTOQUE 
+	  				</f:facet>
+
+						<p:column headerText="Codigo" sortBy="#{produto.codProduto}"
+							filterBy="#{produto.codProduto}" style="width: 12%">
+							<h:outputText value="#{produto.codProduto}" />
+						</p:column>
+
+						<p:column headerText="Descrição" sortBy="#{produto.descricao}"
+							filterBy="#{produto.descricao}" style="width: 12%">
+							<h:outputText value="#{produto.descricao}" />
+						</p:column>
+
+						<p:column headerText="Estoq. Minimo" style="width: 6%">
+							<h:outputText value="#{produto.estoqueMin}" />
+						</p:column>
+
+						<p:column headerText="Estoq. Maximo" style="width: 6%">
+							<h:outputText value="#{produto.estoqueMax}" />
+						</p:column>
+
+						<p:column headerText="Valor Unit." style="width: 6%">
+							<h:outputText value="#{produto.valorUnitario}" />
+						</p:column>
+
+						<p:column headerText="Quant. Estoque" style="width: 6%">
+							<h:outputText value="#{produto.quantEstoque}" />
+						</p:column>
+
+						<p:column headerText="Opções" style="width: 6%">
+							<p:commandButton value="Adicionar"
+								actionListener="#{MBPedidoCompra.adicionar(produto)}"
+								update=":frmPedido:tblItensPedido :frmPedido:txtPedidoValorTotal :msgGlobal" />
+						</p:column>
+					</p:dataTable>
+
+					<p:separator />
+
+					<!-- ITENS PEDIDOS  -->
+					<p:dataTable id="tblItensPedido" widgetVar="tabelaItensPedido"
+						emptyMessage="Nenhum registro encontrado..."
+						value="#{MBPedidoCompra.listaItens}" var="item" paginator="true"
+						rows="3">
+
+						<f:facet name="header">
+	  					LISTA DE ITENS NO PEDIDOS
+	  				</f:facet>
+
+						<p:column headerText="Produto" style="width: 12%">
+							<h:outputText value="#{item.idProduto.descricao}" />
+						</p:column>
+
+						<p:column headerText="Quantidade" style="width: 12%">
+							<h:outputText value="#{item.quantidadeProduto}" />
+						</p:column>
+
+						<p:column headerText="Valor Unit." style="width: 12%">
+							<h:outputText value="#{item.valorUnitario}" />
+						</p:column>
+
+						<p:column headerText="Valor Total Item" style="width: 8%">
+							<h:outputText value="#{item.valorTotalItens}" />
+
+						</p:column>
+
+						<p:column headerText="Opções" style="width: 6%">
+							<p:commandButton value="Remover"
+								actionListener="#{MBPedidoCompra.remover(item)}"
+								update=":frmPedido:tblItensPedido :frmPedido:txtPedidoValorTotal" />
+						</p:column>
+					</p:dataTable>
+
+					<p:separator />
+
+					<center>
+						<h1>
+							<h:outputText id="txtPedidoValorTotal"
+								value="Valor Total Pedido.: #{MBPedidoCompra.pedidoCadastro.valorTotal}" />
+						</h1>
+					</center>
+				</p:tab>
+
+				<!-- 	  Aba Finalizar Pedido -->
+
+				<p:tab id="finalizar" title="Finalizar Pedido">
+					<h:form id="frmFinalizar">
+						<p:panel header="Finalizar Pedido de Compra">
+							<h:panelGrid columns="2">
+								<p:outputLabel for="fornecedor" value="Fornecedor.:"/>
+									<p:selectOneMenu id="fornecedor" filter="true"
+													 value="#{MBPedidoCompra.pedidoCadastro.idFornecedor.idFornecedor}">
+													 
+										<f:selectItem itemLabel="Selecione um fornecedor"/>
+										<f:selectItems value="#{MBPedidoCompra.comboFornecedor}" 
+													   var="fornecedor" itemValue="#{fornecedor.idFornecedor}"
+													   itemLabel="#{fornecedor.razaoSocial}"/>
+									
+									</p:selectOneMenu>
+									
+									<p:outputLabel for="funcionario" value="Funcionario.:"/>
+										<p:selectOneMenu id="funcionario" filter="true"
+														 value="#{MBPedidoCompra.pedidoCadastro.idFuncionario.idFuncionario}">
+											
+											<f:selectItem itemLabel="Selecione o funcionario"/>
+											<f:selectItems value="#{MBPedidoCompra.comboFuncionario}"
+														   var="funcionario" itemValue="#{funcionario.idFuncionario}"
+														   itemLabel="#{funcionario.nome}"/>
+										
+										</p:selectOneMenu>
+									
+									<p:outputLabel value="Data Abertura.:"/>
+										<p:calendar id="data" showOn="button" value="#{MBPedidoCompra.pedidoCadastro.dataAbertura}"/>
+									
+									<p:outputLabel for="status" value="Status do Pedido.:"/>
+										<p:selectOneMenu id="status" value="#{MBPedidoCompra.status}">
+											<f:selectItem itemLabel="Selecione Status do Pedido"/>
+											<f:selectItem itemLabel="Aberto" itemValue="A"/>
+											<f:selectItem itemLabel="Realizado" itemValue="R"/>
+											<f:selectItem itemLabel="Liquidado" itemValue="L"/>
+										
+										</p:selectOneMenu>
+									
+							</h:panelGrid>
+								
+						</p:panel>
+						
+							<p:separator/>
+							
+								<p:commandButton value="Finalizar Pedido"/>
+							
+								<center>
+									<h1>
+										<h:outputText id="valTotalPedido" 
+											  value="Valor Total do Pedido.: #{MBPedidoCompra.pedidoCadastro.valorTotal}"/>
+									</h1>
+								</center>
+					</h:form>
+				</p:tab>
+			</p:wizard>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

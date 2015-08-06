@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<!-- 		Serve para carregar a listagem  preRenderView a função é de antes da tela abrir ele carrega a listagem-->
+		<!-- <f:event listener="#{MBMovimentacao.listagem()}"   -->
+		<!-- 	type="preRenderView" />   -->
+		<h:form id="frmMovListagem">
+
+			<h:panelGrid columns="5" id="pnlComponentePesquisa">
+				<p:outputLabel value="Data Inicial:" />
+				<p:calendar id="maskDataInicial"
+					value="#{MBMovimentacao.filtroMov.dataInicial}" locale="pt"
+					pattern="dd/MM/yyyy" mask="true">
+					<p:watermark for="maskDataInicial" value="19/09/2014" />
+				</p:calendar>
+
+				<p:outputLabel value="Data Final:" />
+				<p:calendar id="maskDataFinal"
+					value="#{MBMovimentacao.filtroMov.dataFinal}" locale="pt"
+					pattern="dd/MM/yyyy" mask="true">
+					<p:watermark for="maskDataFinal" value="19/09/2014" />
+				</p:calendar>
+
+				<p:commandButton value="Buscar" icon="ui-icon-search"
+					action="#{MBMovimentacao.buscar}"
+					update=":msgGlobal :frmMovListagem:tblMovListagem" />
+			</h:panelGrid>
+
+			<p:dataTable id="tblMovListagem" widgetVar="tabelaMovListagem"
+				paginator="true" rows="7" emptyMessage="Nenhum registro encontrado"
+				value="#{MBMovimentacao.listagemMovimentacao}" var="item"
+				filteredValue="#{MBMovimentacao.itensFiltrados}">
+
+				<f:facet name="header">
+					<h:outputText value="Movimentação - Listagem" />
+				</f:facet>
+
+				<p:column headerText="Data">
+					<f:facet name="header">
+						<h:outputText value="Data de Entrada" />
+					</f:facet>
+					<h:outputText value="#{item.dataEntrada}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+
+				<p:column filterBy="#{item.numeroNF}"
+					sortBy="#{item.numeroNF}">
+					<f:facet name="header">
+						<h:outputText value="Número NF"/>
+					</f:facet>
+					<h:outputText value="#{item.numeroNF}" />
+				</p:column>
+
+				<p:column
+					filterBy="#{item.fornecedor.razaoSocial}"
+					sortBy="#{item.fornecedor.razaoSocial}">
+					<f:facet name="header">
+						<h:outputText value="Fornecedor"/>
+					</f:facet>
+					<h:outputText value="#{item.fornecedor.razaoSocial}" />
+				</p:column>
+
+				<p:column headerText="Código Produto" exportable="false"
+					filterBy="#{item.produto.codProduto}"
+					sortBy="#{item.produto.codProduto}">
+					<h:outputText value="#{item.produto.codProduto}" />
+				</p:column>
+
+				<p:column filterBy="#{item.produto.descricao}"
+					sortBy="#{item.produto.descricao}">
+					<f:facet name="header">
+						<h:outputText value="Produto"></h:outputText>
+					</f:facet>
+					<h:outputText value="#{item.produto.descricao}" />
+				</p:column>
+
+				<p:column>
+				<f:facet name="header">
+					<h:outputText value="Quantidade"/>
+				</f:facet>
+					<h:outputText value="#{item.quantidade}" />
+				</p:column>
+
+				<p:column style="width: 6%" exportable="false" headerText="Opções">
+
+					<p:commandButton icon="ui-icon-trash" title="Excluir"
+						oncomplete="PF('dlgExcluirMovimentacao').show();"
+						update=":frmExcluirMovimentacao:pnlExcluirMovimentacao">
+						<f:setPropertyActionListener
+							target="#{MBMovimentacao.movimentacao}" value="#{item}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-pencil" title="Editar"
+						actionListener="#{MBMovimentacao.prepararEditar()}"
+						oncomplete="PF('dlgEditarMovimentacao').show();"
+						update=":frmEditarMovimentacao:pnlEditarMovimentacao">
+						<f:setPropertyActionListener
+							target="#{MBMovimentacao.movimentacao}" value="#{item}" />
+					</p:commandButton>
+
+				</p:column>
+
+				<f:facet name="footer">
+					<p:commandButton value="Entrada" icon="ui-icon-document"
+						oncomplete="PF('dlgNovoMovimentacao').show();"
+						update=":frmNovoMovimentacao:pnlNovoMovimentacao"
+						actionListener="#{MBMovimentacao.preparNovo()}">
+						<p:resetInput target=":frmNovoMovimentacao:pnlNovoMovimentacao" />
+					</p:commandButton>
+
+				</f:facet>
+			</p:dataTable>
+
+			<!-- 			imagem que gera a exportação a partir dos dados da tabela -->
+			<h3>Export</h3>
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para pdf"
+					style="height: 30px" value="/imagens/Adobe_PDF_icon.png" />
+				<p:dataExporter encoding="iso-8859-1" type="pdf"
+					target="tblMovListagem" fileName="Entrada em Estoque" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para excel"
+					style="height: 30px" value="/imagens/excel.png" />
+				<p:dataExporter type="xls" target="tblMovListagem"
+					fileName="Entrada em Estoque" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para csv"
+					style="height: 30px" value="/imagens/csv.png" />
+				<p:dataExporter type="csv" target="tblMovListagem"
+					fileName="Entrada em Estoque" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para xml"
+					style="height: 30px" value="/imagens/xml.png" />
+				<p:dataExporter type="xml" target="tblMovListagem"
+					fileName="Entrada em Estoque" />
+			</p:commandLink>
+		</h:form>
+
+
+		<p:dialog widgetVar="dlgNovoMovimentacao" closable="true"
+			draggable="false" resizable="false" header="Entrada - Novo"
+			appendTo="@(body)" modal="true">
+			<h:form id="frmNovoMovimentacao">
+				<h:panelGrid id="pnlNovoMovimentacao" columns="2">
+
+					<p:outputLabel value="Data Entrada: *" />
+					<p:calendar value="#{MBMovimentacao.movimentacao.dataEntrada}"
+						title="Exibe o calendário" showOn="button" required="true"
+						requiredMessage="O campo data da entrada é obrigatório"
+						locale="pt" pattern="dd/MM/yyyy" mask="true">
+					</p:calendar>
+
+					<p:outputLabel for="fornecedor" value="Fornecedor:" />
+					<p:selectOneMenu id="fornecedor" filter="true"
+						value="#{MBMovimentacao.movimentacao.fornecedor.idFornecedor}"
+						required="true"
+						requiredMessage="O campo fornecedor é obrigatório.">
+
+						<f:selectItem itemLabel="Selecione uma fornecedor" />
+
+						<f:selectItems value="#{MBMovimentacao.comboFornecedor}"
+							var="item" itemValue="#{item.idFornecedor}"
+							itemLabel="#{item.razaoSocial}" />
+					</p:selectOneMenu>
+
+					<p:outputLabel for="produto" value="Produto:" />
+					<p:selectOneMenu id="produto" filter="true"
+						value="#{MBMovimentacao.movimentacao.produto.idProduto}"
+						required="true" requiredMessage="O campo produto é obrigatório.">
+
+						<f:selectItem itemLabel="Selecione um Produto" />
+
+						<f:selectItems value="#{MBMovimentacao.comboProduto}" var="item"
+							itemValue="#{item.idProduto}"
+							itemLabel="#{item.codProduto} - #{item.descricao}" />
+					</p:selectOneMenu>
+
+
+					<p:outputLabel value="NF: *" />
+					<p:inputText value="#{MBMovimentacao.movimentacao.numeroNF}" />
+
+					<p:outputLabel value="Quantidade: *" />
+					<p:inputText required="true"
+						requiredMessage="O campo quantidade é obrigatório"
+						value="#{MBMovimentacao.movimentacao.quantidade}" />
+
+					<p:outputLabel value="Observação:" />
+					<p:inputText value="#{MBMovimentacao.movimentacao.observacao}" />
+
+				</h:panelGrid>
+				<br />
+				<font color="red"> <h:outputText value="*" />
+				</font>
+				<h:outputLabel value="Indica campo requerido" />
+				<center>
+					<p:commandButton value="Salvar" icon="ui-icon-check"
+						actionListener="#{MBMovimentacao.salvar}"
+						oncomplete="verificar2(xhr, status, args, 'dlgNovoMovimentacao', 'tabelaMovListagem' )"
+						update=":frmMovListagem:tblMovListagem :frmNovoMovimentacao :msgGlobal" />
+
+					<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+						oncomplete="PF('dlgNovoMovimentacao').hide();">
+
+					</p:commandButton>
+				</center>
+
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgEditarMovimentacao" closable="true"
+			draggable="false" resizable="false" header="Editar - Movimentacao"
+			appendTo="@(body)" modal="true">
+			<h:form id="frmEditarMovimentacao">
+				<h:panelGrid id="pnlEditarMovimentacao" columns="2">
+					<p:outputLabel value="Data Entrada: *" />
+					<p:calendar value="#{MBMovimentacao.movimentacao.dataEntrada}"
+						title="Exibe o calendário" showOn="button" required="true"
+						requiredMessage="O campo data da entrada é obrigatório"
+						locale="pt" pattern="dd/MM/yyyy" mask="true">
+					</p:calendar>
+
+					<p:outputLabel for="fornecedorr" value="Fornecedor:" />
+					<p:selectOneMenu id="fornecedorr" filter="true"
+						value="#{MBMovimentacao.movimentacao.fornecedor.idFornecedor}"
+						required="true"
+						requiredMessage="O campo fornecedor é obrigatório.">
+
+						<f:selectItem itemLabel="Selecione uma fornecedor" />
+
+						<f:selectItems value="#{MBMovimentacao.comboFornecedor}"
+							var="item" itemValue="#{item.idFornecedor}"
+							itemLabel="#{item.razaoSocial}" />
+					</p:selectOneMenu>
+
+					<p:outputLabel for="produto" value="Produto:" />
+					<p:selectOneMenu id="produto" filter="true"
+						value="#{MBMovimentacao.movimentacao.produto.idProduto}"
+						required="true" requiredMessage="O campo produto é obrigatório.">
+
+						<f:selectItem itemLabel="Selecione um Produto" />
+
+						<f:selectItems value="#{MBMovimentacao.comboProduto}" var="item"
+							itemValue="#{item.idProduto}" itemLabel="#{item.descricao}" />
+					</p:selectOneMenu>
+
+
+					<p:outputLabel value="NF: *" />
+					<p:inputText value="#{MBMovimentacao.movimentacao.numeroNF}" />
+
+					<p:outputLabel value="Quantidade: *" />
+					<p:inputText required="true"
+						requiredMessage="O campo quantidade é obrigatório"
+						value="#{MBMovimentacao.movimentacao.quantidade}" />
+
+					<p:outputLabel value="Observação:" />
+					<p:inputText value="#{MBMovimentacao.movimentacao.observacao}" />
+
+				</h:panelGrid>
+
+				<br />
+				<font color="red"> <h:outputText value="*" />
+				</font>
+				<h:outputLabel value="Indica campo requerido" />
+				<center>
+					<p:commandButton value="Editar" icon="ui-icon-check"
+						actionListener="#{MBMovimentacao.editar}"
+						oncomplete="verificar(xhr, status, args, 'dlgEditarMovimentacao', 'tabelaMovListagem' )"
+						update=":frmMovListagem:tblMovListagem :frmEditarMovimentacao :msgGlobal" />
+
+					<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+						oncomplete="PF('dlgEditarMovimentacao').hide();">
+
+					</p:commandButton>
+				</center>
+			</h:form>
+
+		</p:dialog>
+
+
+
+		<p:dialog widgetVar="dlgExcluirMovimentacao" closable="true"
+			draggable="false" resizable="false" header="Excluir - Movimentacao"
+			appendTo="@(body)" modal="true">
+			<h:form id="frmExcluirMovimentacao">
+				<h:panelGrid id="pnlExcluirMovimentacao" columns="2">
+					<p:outputLabel value="Data Entrada:" />
+					<p:outputLabel value="#{MBMovimentacao.movimentacao.dataEntrada}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</p:outputLabel>
+
+					<p:outputLabel value="Fornecedor:" />
+					<p:outputLabel
+						value="#{MBMovimentacao.movimentacao.fornecedor.razaoSocial}" />
+
+					<p:outputLabel value="Produto:" />
+					<p:outputLabel
+						value="#{MBMovimentacao.movimentacao.produto.descricao}" />
+
+
+					<p:outputLabel value="NF:" />
+					<p:outputLabel value="#{MBMovimentacao.movimentacao.numeroNF}" />
+
+					<p:outputLabel value="Quantidade:" />
+					<p:outputLabel required="true"
+						requiredMessage="O campo quantidade é obrigatório"
+						value="#{MBMovimentacao.movimentacao.quantidade}" />
+
+					<p:outputLabel value="Observação:" />
+					<p:outputLabel value="#{MBMovimentacao.movimentacao.observacao}" />
+
+				</h:panelGrid>
+				<center>
+					<p:commandButton value="Excluir" icon="ui-icon-check"
+						actionListener="#{MBMovimentacao.excluir}"
+						oncomplete="verificar(xhr, status, args, 'dlgExcluirMovimentacao', 'tabelaMovListagem' )"
+						update=":frmMovListagem:tblMovListagem :frmExcluirMovimentacao :msgGlobal" />
+
+					<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+						oncomplete="PF('dlgExcluirMovimentacao').hide();">
+
+					</p:commandButton>
+				</center>
+
+			</h:form>
+
+		</p:dialog>
+	</ui:define>
+
+
+
+</ui:composition>

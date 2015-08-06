@@ -1,0 +1,28 @@
+package br.com.jmesystemv1.test;
+
+import br.com.jmesystemv1.dao.JmeProdutoDAO;
+import br.com.jmesystemv1.domain.JmeProduto;
+
+public class JmeProdutoTest {
+	
+	public static void main(String [] args){
+		
+		JmeProdutoDAO dao = new JmeProdutoDAO();
+		JmeProduto pro = new JmeProduto();
+		
+		pro.setCodFornecedor(11);
+		pro.setCodProduto("22");
+		pro.setDescricao("33");
+		pro.setEstoqueMax(44);
+		pro.setEstoqueMin(55);
+		pro.setMarca("77");
+		pro.setModelo("88");
+		pro.setQuantEstoque(99);
+	pro.setValorUnitario(10.0);
+		
+		
+	dao.salvar(pro);
+		
+		//dao.excluir(1);
+	}
+}

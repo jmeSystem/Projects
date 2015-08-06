@@ -1,0 +1,24 @@
+package br.com.jmesystemv1.domain;
+
+public class JmeCidade {
+	
+	private Integer idCidade;
+	private String nome;
+	
+	
+	public Integer getIdCidade() {
+		return idCidade;
+	}
+	public void setIdCidade(Integer idCidade) {
+		this.idCidade = idCidade;
+	}
+	public String getNome() {
+		return nome;
+	}
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+	
+	
+
+}

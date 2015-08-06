@@ -1,0 +1,118 @@
+package br.com.jmesystemv1.relatorio;
+
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.com.jmesystemv1.factory.ConexaoFactory;
+import br.com.jmesystemv1.util.JSFUtil;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.view.JasperViewer;
+@ManagedBean(name = "MBClienteRelatorio")
+@ViewScoped
+public class relatorioCliente extends HttpServlet {
+
+	private static final long serialVersionUID = 1L;
+	
+	Integer id;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public void gerarRelatorio() {
+		// HashMap hm = new HashMap();
+
+		try {
+			/*
+			 * hm.put("MUNICIPIO_SELECIONADO", municipioSelecionado);
+			 * hm.put("LOGRADOURO_SELECIONADO", logradouroSelecionado);
+			 * hm.put("CODIGO_LOGRADOURO_SELECIONADO",
+			 * codigoLogradouroSelecionado);
+			 */
+
+			InputStream caminho = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/relatorios/Cliente.jrxml");
+
+			JasperReport report = JasperCompileManager.compileReport(caminho);
+
+			JasperPrint print = JasperFillManager.fillReport(report, null,
+					ConexaoFactory.conectar());
+
+			
+			byte[] bytes = JasperExportManager.exportReportToPdf(print);
+			if (bytes != null) {
+				HttpServletResponse response = JSFUtil.getResponse();
+				response.setContentType("application/pdf");
+				response.setHeader("Content-disposition",
+						"attachment;filename=ListagemClientes.pdf");
+				response.setContentLength(bytes.length);
+				response.getOutputStream().write(bytes, 0, bytes.length);
+				response.getOutputStream().flush();
+				response.flushBuffer();
+				JSFUtil.responseComplete();		
+				JasperExportManager.exportReportToPdf(print);
+				//abre o relatorio direito
+				//JasperViewer.viewReport(print, false);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void relatorioParametro() {
+		HashMap hm = new HashMap();
+
+		try {
+
+			hm.put("CODIGO", id);
+
+			InputStream caminho = getClass().getResourceAsStream(
+					"reports/Cliente.jrxml");
+
+			JasperReport report = JasperCompileManager.compileReport(caminho);
+
+			JasperPrint print = JasperFillManager.fillReport(report, hm,
+					ConexaoFactory.conectar());
+
+			byte[] bytes = JasperExportManager.exportReportToPdf(print);
+			if (bytes != null) {
+				// HttpServletResponse response = JSFUtil.getResponse();
+				// response.setContentType("application/pdf");
+				// response.setHeader("Content-disposition",
+				// "attachment;filename=RelatorioParametro.pdf");
+				// response.setContentLength(bytes.length);
+				// response.getOutputStream().write(bytes, 0, bytes.length);
+				// response.getOutputStream().flush();
+				// response.flushBuffer();
+				// JSFUtil.responseComplete();
+				// JasperViewer.viewReport(print, false);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	}
+

@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<f:event listener="#{MBRegistroVenda.listar}" type="preRenderView" />
+
+
+		<h:form id="frmVenda">
+
+			<!-- 		ABA INICIAL INCLUSÃO DO ITENS DE VENDA -->
+			<p:wizard nextLabel="Próximo" backLabel="Voltar"
+				showStepStatus="false" flowListener="#{MBRegistroVenda.handleFlow}">
+				<p:tab id="carrinho" title="Itens - Venda">
+					<p:panel header="Venda">
+
+						<!-- 				Cabeçalho da tabela -->
+
+						<!-- 					TABELA PRODUTO -->
+						<p:dataTable id="tabelaProdutos"
+							emptyMessage="Nenhum registro encontrado." widgetVar="tblProduto"
+							value="#{MBRegistroVenda.listaProdutos}" var="item"
+							paginator="true" rows="3"
+							filteredValue="#{MBRegistroVenda.itensFiltrados}">
+
+							<f:facet name="header">
+								<h:outputLabel value="Produtos - Listagem"/>
+							</f:facet>
+							
+
+							<p:column headerText="ID" filterBy="#{item.idProduto}"
+								sortBy="#{produto.idProduto}">
+								<h:outputText value="#{item.idProduto}" />
+							</p:column>
+							<p:column headerText="COD" filterBy="#{item.codProduto}"
+								sortBy="#{item.codProduto}">
+								<h:outputText value="#{item.codProduto}" />
+							</p:column>
+							<p:column headerText="DESCRIÇÃO" filterBy="#{item.descricao}"
+								sortBy="#{item.descricao}">
+								<h:outputText value="#{item.descricao}" />
+							</p:column>
+
+							<p:column headerText="MODELO" filterBy="#{item.modelo}"
+								sortBy="#{item.modelo}">
+								<h:outputText value="#{item.modelo}" />
+							</p:column>
+							<p:column headerText="MARCA" sortBy="#{item.marca}"
+								filterBy="#{item.marca}">
+								<h:outputText value="#{item.marca}" />
+							</p:column>
+							<p:column headerText="VALOR UNIT." style="width: 6%">
+								<h:outputText value="#{item.valorUnitario}" />
+							</p:column>
+							<p:column
+								styleClass="#{item.quantEstoque==0 ? 'linhaEstiloPendente' : null}"
+								headerText="QUANT. ESTOQUE" style="width: 6%">
+								<h:outputText value="#{item.quantEstoque}" />
+							</p:column>
+
+							<p:column headerText="Opções" style="width: 7%">
+
+								<p:commandButton icon="ui-icon-plus" value="Adicionar"
+									title="Adicionar Produto"
+									actionListener="#{MBRegistroVenda.adicionarProduto(item)}"
+									update=":frmVenda:tblItens :frmVenda:txtValor :msgGlobal">
+
+
+								</p:commandButton>
+
+							</p:column>
+
+						</p:dataTable>
+
+
+						<p:separator />
+
+						<!-- 						TABELA ITENS DA VENDA -->
+
+						<p:dataTable editable="true" id="tblItens"
+							emptyMessage="Nenhum registro encontrado."
+							value="#{MBRegistroVenda.listaItens}" var="item" paginator="true"
+							rows="3">
+							
+							<f:facet name="header">
+								<h:outputLabel value="Itens - Venda"/>
+							</f:facet>
+							
+							<p:column headerText="Produto" style="width: 30%">
+								<h:outputText value="#{item.produto.descricao}" />
+							</p:column>
+
+							<p:column headerText="Modelo" style="width: 20%">
+								<h:outputText value="#{item.produto.modelo}" />
+							</p:column>
+
+							<p:column headerText="Quantidade" style="width: 5%">
+
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{item.quantidade}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:spinner min="1" size="5" maxlength="5"
+											value="#{item.quantidade}" label="Quantidade" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="Valor Unit." style="width: 7%">
+								<h:outputText value="#{item.produto.valorUnitario}" />
+							</p:column>
+
+
+							<p:column headerText="Valor." style="width: 7%">
+								<h:outputText converter="javax.faces.BigDecimal"
+									value="#{item.valorTotalItens}" />
+							</p:column>
+
+							<p:column headerText="Opções" style="width: 6%">
+								<p:commandButton icon="ui-icon-trash" value="Remover"
+									title="Remover Item"
+									actionListener="#{MBRegistroVenda.removerItem(item)}"
+									update=":frmVenda:tblItens :frmVenda:txtValor  " />
+							</p:column>
+
+							<p:column style="width: 3%" headerText="Editar">
+								<p:rowEditor />
+							</p:column>
+
+							<p:ajax immediate="true" event="rowEdit" process="@this"
+								listener="#{MBRegistroVenda.editarItem(item)}"
+								partialSubmit="true"
+								update=":frmVenda:tblItens :frmVenda:txtValor  :msgGlobal" />
+
+						</p:dataTable>
+
+						<p:separator />
+
+						<center>
+							<h3>
+								<h:outputText id="txtValor"
+									value="
+									Total R$: #{MBRegistroVenda.vendaCadastro.valorTotal}" />
+							</h3>
+						</center>
+					</p:panel>
+				</p:tab>
+
+				<!-- 					ABA - PAGAMENTO-->
+
+				<p:tab title="Pagamento - Venda">
+					<p:panel header="Detalhes do Venda">
+
+						<!-- 							responsavel pro exibir a mensagem -->
+						<p:growl />
+
+						<h:panelGrid id="pnlFinVenda" columns="4">
+
+							<p:outputLabel for="Cliente" value="Cliente:" />
+							<p:selectOneMenu id="Cliente" filter="true"
+								value="#{MBRegistroVenda.vendaCadastro.cliente.idCliente}"
+								required="true" requiredMessage="O campo Cliente é obrigatório">
+
+								<f:selectItem itemLabel="Selecione um cliente" />
+
+								<f:selectItems value="#{MBRegistroVenda.comboCliente}"
+									var="item" itemValue="#{item.idCliente}"
+									itemLabel="#{item.nome}" />
+
+								<p:ajax event="change" listener="#{MBRegistroVenda.confirmacao}"
+									update=":frmVenda:cpf" />
+							</p:selectOneMenu>
+
+							<h:outputText value="CPF:" />
+							<h:inputText id="cpf" disabled="true"
+								value="#{MBRegistroVenda.vendaCadastro.cliente.cpf}" />
+
+							<p:outputLabel value="Funcionario:" />
+							<p:outputLabel disabled="true"
+								value="#{MBRegistroVenda.funcionario.nome}" />
+
+
+
+							<h:outputText value="Data Venda" />
+							<h:outputText value="#{MBRegistroVenda.vendaCadastro.dataVenda}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</h:outputText>
+
+						</h:panelGrid>
+
+						<p:panel header="Detalhes do Pagamento">
+							<!-- 					responsavel pro exibir a mensagem -->
+							<p:growl />
+							<h:panelGrid columns="2">
+
+								<p:outputLabel for="pagamento" value="Forma de Pagamento:" />
+								<p:selectOneMenu id="pagamento" filter="true"
+									value="#{MBRegistroVenda.vendaCadastro.formaPagamento.idFormaPagamento}"
+									required="true"
+									requiredMessage="O campo pagamento é obrigatorio">
+
+									<f:selectItem itemLabel="Selecione uma forma de pagamento" />
+
+									<f:selectItems value="#{MBRegistroVenda.comboPagamento}"
+										var="item" itemValue="#{item.idFormaPagamento}"
+										itemLabel="#{item.descricao}" />
+
+									<p:ajax
+										update=":frmVenda:quantidade :frmVenda:valorDescontoAcrescimo :frmVenda:valorParcela :frmVenda:valorRecebido :frmVenda:tipoFormaPagamento :msgGlobal"
+										listener="#{MBRegistroVenda.confirmacao}" />
+								</p:selectOneMenu>
+
+								<p:outputLabel for="tipoFormaPagamento"
+									value="Tipo de Pagamento:" />
+								<p:selectOneMenu id="tipoFormaPagamento" filter="true"
+									disabled="#{MBRegistroVenda.abilitarPagamento}"
+									value="#{MBRegistroVenda.pagamento.tipoFormaPagamento.idTipoFormaPagamento}"
+									required="true"
+									requiredMessage="Tipo de Pagamento é obrigatório">
+
+									<f:selectItem itemLabel="Selecione um tipo de pagamento" />
+
+									<f:selectItems
+										value="#{MBRegistroVenda.comboTipoFormaPagamento}" var="item"
+										itemValue="#{item.idTipoFormaPagamento}"
+										itemLabel="#{item.descricao}" />
+
+									<p:ajax listener="#{MBRegistroVenda.confirmacao}" />
+								</p:selectOneMenu>
+
+								<h:outputText value="Desconto/Acréscimo" />
+								<p:selectOneRadio id="descontoAcrescimo"
+									value="#{MBRegistroVenda.tipoAcrescimo}">
+
+									<f:selectItem itemLabel="Desconto" itemValue="0" />
+									<f:selectItem itemLabel="Acréscimo" itemValue="1"
+									 />
+
+									<p:ajax listener="#{MBRegistroVenda.calcularDesconto}"
+										update=":frmVenda:valorTotal :frmVenda:valorParcela :msgGlobal" />
+								</p:selectOneRadio>
+
+								<h:outputText value="Valor Desconto/Acréscimo (%)" />
+								<p:spinner id="valorDescontoAcrescimo"
+									value="#{MBRegistroVenda.valorDescontoAcrescimo}"
+									max="#{MBRegistroVenda.tipoAcrescimo!=1 
+									? MBRegistroVenda.valorDesconto : MBRegistroVenda.valorAcrescimo}"
+									title="Valor do Desconto/Acréscimo" min="0" size="3">
+
+									<p:ajax event="keyup" update=":frmVenda:valorTotal  :msgGlobal"
+										listener="#{MBRegistroVenda.calcularDesconto}" />
+
+									<p:ajax event="change"
+										update=":frmVenda:valorTotal  :msgGlobal"
+										listener="#{MBRegistroVenda.calcularDesconto}" />
+								</p:spinner>
+
+								<h:outputText value="Número de Parcelas" />
+
+								<p:spinner id="quantidade"
+									value="#{MBRegistroVenda.pagamento.numeroParcelas}" min="0"
+									max="#{MBRegistroVenda.quantidadeParcela}" maxlength="3"
+									size="3">
+
+
+									<p:ajax event="change"
+										listener="#{MBRegistroVenda.calcularParcela}"
+										update=":frmVenda:valorParcela :msgGlobal" />
+
+									<p:ajax event="keyup"
+										listener="#{MBRegistroVenda.calcularParcela}"
+										update=":frmVenda:valorParcela :msgGlobal" />
+
+								</p:spinner>
+
+								<h:outputText value="Valor da Parcela:" />
+								<h:outputText converter="javax.faces.Number" id="valorParcela"
+									value="#{MBRegistroVenda.parcela.valor}" />
+
+								<h:outputText value="SubTotal R$:" />
+								<h:outputText id="subTotal" converter="javax.faces.Number"
+									value="#{MBRegistroVenda.vendaCadastro.valorTotal}" />
+
+								<h:outputText value="Valor a Pagar R$:" />
+								<h:outputText id="valorTotal" converter="javax.faces.Number"
+									value="#{MBRegistroVenda.vendaCadastro.valorPagar}" />
+
+							</h:panelGrid>
+
+							<h:panelGrid columns="4">
+								<h:outputText value="Valor Recebido R$:" />
+								<h:inputText id="valorRecebido"
+									disabled="#{MBRegistroVenda.abilitarPagamento}"
+									value="#{MBRegistroVenda.valorRecebido}">
+									<p:ajax event="keyup"
+										listener="#{MBRegistroVenda.calcularTroco}"
+										update=":frmVenda:valorVoltar" />
+
+								</h:inputText>
+
+								<h:outputText value="Valor a voltar R$:" />
+								<h:outputText converter="javax.faces.Number" id="valorVoltar"
+									value="#{MBRegistroVenda.valorVoltar}" />
+							</h:panelGrid>
+
+						</p:panel>
+					</p:panel>
+
+					<h:panelGrid columns="3"></h:panelGrid>
+					<br/>
+				<font color="red"> <h:outputText value="*" />
+				</font>
+				<h:outputLabel value="Indica campo requerido" />
+					<p:separator />
+
+				</p:tab>
+				<p:tab title="Confirmação - Venda">
+					<p:panel header="Confirmação - Venda" id="confirmacao">
+
+						<h:panelGrid columns="4">
+							<h:outputText value="Data Venda:" />
+							<h:outputText value="#{MBRegistroVenda.vendaCadastro.dataVenda}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</h:outputText>
+
+							<h:outputText value="Funcionário:" />
+							<h:outputText value=" #{MBRegistroVenda.funcionario.nome}" />
+
+							<h:outputText value="Cliente:" />
+							<h:outputText
+								value="#{MBRegistroVenda.vendaCadastro.cliente.nome}" />
+
+							<h:outputText value="CPF:" />
+							<h:outputText
+								value="#{MBRegistroVenda.vendaCadastro.cliente.cpf}" />
+
+							<h:outputText value="Desconto (%):" />
+							<h:outputText value="#{MBRegistroVenda.desconto}" />
+
+							<h:outputText value="Acréscimo (%):" />
+							<h:outputText value="#{MBRegistroVenda.acrescimo}" />
+
+							<h:outputText value="SubTotal R$:" />
+							<h:outputText value="#{MBRegistroVenda.vendaCadastro.valorTotal}" />
+
+							<h:outputText value="Valor a Pagar:" />
+							<h:outputText value="#{MBRegistroVenda.vendaCadastro.valorPagar}" />
+
+							<h:outputText value="QTDE de Parcelas:" />
+							<h:outputText
+								value="#{MBRegistroVenda.pagamento.numeroParcelas} " />
+
+							<h:outputText value="Valor da Parcela:" />
+							<h:outputText converter="javax.faces.Number"
+								value="#{MBRegistroVenda.parcela.valor}" />
+
+							<h:outputText value="Tipo de Pagamento:" />
+							<h:outputText
+								value="#{MBRegistroVenda.pagamento.tipoFormaPagamento.descricao}" />
+
+							<h:outputText value="Forma de Pagamento:" />
+							<h:outputText
+								value="#{MBRegistroVenda.vendaCadastro.formaPagamento.descricao}" />
+
+
+
+
+						</h:panelGrid>
+
+						<p:separator />
+
+						<h:panelGrid id="Produtos">
+							<p:dataTable id="tblConfirmacaoItens"
+								value="#{MBRegistroVenda.listaItens}" var="item" rows="10">
+
+								<p:column headerText="Produto" style="width: 30%">
+									<h:outputText value="#{item.produto.descricao}" />
+								</p:column>
+
+								<p:column headerText="Modelo" style="width: 20%">
+									<h:outputText value="#{item.produto.modelo}" />
+								</p:column>
+
+								<p:column headerText="Quantidade" style="width: 5%">
+
+									<p:cellEditor>
+										<f:facet name="output">
+											<h:outputText value="#{item.quantidade}" />
+										</f:facet>
+										<f:facet name="input">
+											<p:spinner min="1" size="5" maxlength="5"
+												value="#{item.quantidade}" label="Quantidade" />
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+
+								<p:column headerText="Valor Unit." style="width: 20%">
+									<h:outputText value="#{item.produto.valorUnitario}" />
+								</p:column>
+
+
+								<p:column headerText="Valor." style="width: 7%">
+									<h:outputText converter="javax.faces.BigDecimal"
+										value="#{item.valorTotalItens}" />
+								</p:column>
+
+
+
+							</p:dataTable>
+						</h:panelGrid>
+
+					</p:panel>
+					<font color="red"> <h:outputText
+							value="Por favor, antes de finalizar a venda imprimir o cupom." />
+					</font>
+					<h:panelGrid columns="3">
+						<p:commandButton icon="ui-icon-check" value="Finalizar"
+							ajax="false" action="/pages/jmeVenda.xhtml"
+							actionListener="#{MBRegistroVenda.salvar}" update=":msgGlobal" />
+
+						<p:commandButton icon="ui-icon-close" value="Cancelar"
+							ajax="false" actionListener="#{MBRegistroVenda.cancelarVenda}"
+							action="/pages/jmeVenda.xhtml" update=":msgGlobal" />
+
+						<p:commandButton value="Imprimir" type="button"
+							icon="ui-icon-print">
+							<p:printer target="confirmacao" />
+
+						</p:commandButton>
+					</h:panelGrid>
+				</p:tab>
+
+			</p:wizard>
+
+		</h:form>
+
+
+	</ui:define>
+
+
+
+
+
+
+</ui:composition>

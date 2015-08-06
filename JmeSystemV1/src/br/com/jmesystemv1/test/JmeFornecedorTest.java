@@ -1,0 +1,99 @@
+package br.com.jmesystemv1.test;
+
+import java.util.Date;
+import java.util.List;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
+import br.com.jmesystemv1.dao.JmeFornecedorDAO;
+import br.com.jmesystemv1.domain.JmeCidade;
+import br.com.jmesystemv1.domain.JmeFornecedor;
+
+public class JmeFornecedorTest {
+		
+	@Test
+	
+	public void salvar(){
+		JmeFornecedor fornecedor = new JmeFornecedor();
+		JmeFornecedorDAO fornDAO = new JmeFornecedorDAO();
+		JmeCidade cidade = new JmeCidade();
+		
+		cidade.setIdCidade(13);
+		fornecedor.setDataCadastro(new Date());
+		fornecedor.setRazaoSocial("FORNECEDOR2");
+		fornecedor.setNomeFantasia("FORNECEDOR2");
+		fornecedor.setCnpj("222");
+		fornecedor.setTelefoneFixo("999");
+		fornecedor.setEmail("hotmail");
+		fornecedor.setEndereco("Rua alameda");
+		fornecedor.setCep("18880900");
+		fornecedor.setCaixaPostal(321);
+		fornecedor.setJmeCidade(cidade);
+		
+		
+		fornDAO.salvar(fornecedor);
+		System.out.println(fornecedor);
+	}
+	
+	@Test
+	@Ignore
+	public void buscarPorCodigo(){
+		JmeFornecedorDAO dao = new JmeFornecedorDAO();
+		
+		JmeFornecedor fornecedor = dao.buscarPorCodigo(3);
+		System.out.println(fornecedor);
+	}
+	
+	@Test
+	@Ignore
+	public void excluir(){
+		
+		JmeFornecedorDAO dao = new JmeFornecedorDAO();
+		
+		JmeFornecedor fornecedor = dao.buscarPorCodigo(8);
+		if(fornecedor != null){
+		dao.excluir(fornecedor);
+		}
+		
+	}
+	
+	@Test
+	@Ignore
+	public void editar(){
+		
+		JmeFornecedorDAO dao = new JmeFornecedorDAO();
+		JmeCidade cidade = new JmeCidade();
+		
+		JmeFornecedor fornecedor = dao.buscarPorCodigo(1);
+		
+		cidade.setIdCidade(10);
+		fornecedor.setDataCadastro(new Date());
+		fornecedor.setRazaoSocial("FORNECEDOR");
+		fornecedor.setNomeFantasia("FORNECEDOR");
+		fornecedor.setCnpj("333");
+		fornecedor.setTelefoneFixo("999111");
+		fornecedor.setEmail("gmail");
+		fornecedor.setEndereco("Rua Joaquim");
+		fornecedor.setCep("1990900");
+		fornecedor.setCaixaPostal(111);
+		fornecedor.setJmeCidade(cidade);
+		
+		dao.editar(fornecedor);
+	}
+	
+	@Test
+	@Ignore
+	public void listar(){
+		
+		JmeFornecedorDAO dao = new JmeFornecedorDAO();
+		List<JmeFornecedor> fornecedor = dao.listar();
+		
+		for (JmeFornecedor jmeFornecedor : fornecedor) {
+			System.out.println(jmeFornecedor);
+		}
+	}
+	
+	
+
+}

@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<!-- 		Serve para carregar a listagem  preRenderView a função é de antes da tela abrir ele carrega a listagem-->
+		<f:event listener="#{MBTipoFormaPagamento.carregarListagem}"
+			type="preRenderView" />
+
+
+		<h:form id="frmTipoFormaPagListagem">
+			<p:dataTable id="tblTipoFormaPagListagem"
+				widgetVar="tabelaTipoFormaPagListagem" var="item"
+				emptyMessage="Nenhum registro encontrado."
+				value="#{MBTipoFormaPagamento.listagemTipoFormaPagamento}"
+				filteredValue="#{MBTipoFormaPagamento.itensFiltrados}"
+				paginator="true" rows="7" style="margin-bottom:20px">
+
+				<!-- 				Cabeçalho da tabela -->
+				<f:facet name="header">
+					<h:outputText value="Tipo Forma de Pagamento - Listagem" />
+				</f:facet>
+
+				<!--tirei o heaerText e acrescentei o facet, porque(pois para importa relatorio apartir da pesquisa  
+				eo nome do cabeçalho ser exportado junto, precisei acrescentar a tag f:facet) -->
+				<p:column filterBy="#{item.idTipoFormaPagamento}"
+					sortBy="#{item.idTipoFormaPagamento}">
+					<f:facet name="header">
+						<h:outputText value="Código" />
+					</f:facet>
+					<h:outputText value="#{item.idTipoFormaPagamento}" />
+				</p:column>
+
+				<p:column filterBy="#{item.descricao}" sortBy="#{item.descricao}">
+					<f:facet name="header">
+						<h:outputText value="Descricao" />
+					</f:facet>
+					<h:outputText value="#{item.descricao}" />
+				</p:column>
+
+				<p:column filterBy="#{item.formaPagamento.descricao}"
+					sortBy="#{item.formaPagamento.descricaoo}">
+					<f:facet name="header">
+						<h:outputText value="Descricao" />
+					</f:facet>
+					<h:outputText value="#{item.formaPagamento.descricao}" />
+				</p:column>
+
+
+				<p:column style="width: 6%" exportable="false" headerText="Opções">
+
+					<p:commandButton icon="ui-icon-trash" title="Excluir"
+						oncomplete="PF('dlgTipoFormaPagExcluir').show();"
+						update=":frmTipoFormaPagExcluir:pnlTipoFormaPagExcluir">
+						<f:setPropertyActionListener
+							target="#{MBTipoFormaPagamento.tipoFormaPagamento}"
+							value="#{item}" />
+
+						<p:commandButton icon="ui-icon-pencil" title="Editar"
+							oncomplete="PF('dlgTipoFormaPagEditar').show();"
+							update=":frmTipoFormaPagamentoEditar:pnlTipoFormaPagamentoEditar"
+							actionListener="#{MBTipoFormaPagamento.prepararEditar}">
+							<f:setPropertyActionListener
+								target="#{MBTipoFormaPagamento.tipoFormaPagamento}"
+								value="#{item}" />
+						</p:commandButton>
+
+
+					</p:commandButton>
+
+
+				</p:column>
+
+				<!-- 				Botão novo do categoria -->
+				<f:facet name="footer">
+					<p:commandButton value="Novo" icon="ui-icon-document"
+						action="#{MBTipoFormaPagamento.prepararNovo}"
+						oncomplete="PF('dlgTipoFormaPagNovo').show();"
+						title="Novo: Tipo Forma de Pagamento"
+						update=":frmTipoFormaPagNovo:pnlTipoFormaPagNovo :msgGlobal">
+						<p:resetInput target=":frmTipoFormaPagNovo:pnlTipoFormaPagNovo" />
+					</p:commandButton>
+
+				</f:facet>
+
+			</p:dataTable>
+			
+			<!-- 			imagem que gera a exportação a partir dos dados da tabela -->
+			<h3>Export</h3>
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para pdf"
+					style="height: 30px" value="/imagens/Adobe_PDF_icon.png" />
+				<p:dataExporter encoding="iso-8859-1" type="pdf"
+					target="tblTipoFormaPagListagem" fileName="Formas de Pagamento" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para excel"
+					style="height: 30px" value="/imagens/excel.png" />
+				<p:dataExporter type="xls" target="tblTipoFormaPagListagem"
+					fileName="Formas de Pagamento" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para csv"
+					style="height: 30px" value="/imagens/csv.png" />
+				<p:dataExporter type="csv" target="tblTipoFormaPagListagem"
+					fileName="Formas de Pagamento" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para xml"
+					style="height: 30px" value="/imagens/xml.png" />
+				<p:dataExporter type="xml" target="tblTipoFormaPagListagem"
+					fileName="Formas de Pagamento" />
+			</p:commandLink>
+		</h:form>
+
+		<p:dialog widgetVar="dlgTipoFormaPagNovo" closable="true"
+			draggable="false" resizable="false"
+			header="Tipo Forma de Pagamento - Novo" appendTo="@(body)"
+			modal="true">
+			<h:form id="frmTipoFormaPagNovo">
+				<h:panelGrid id="pnlTipoFormaPagNovo" columns="2">
+					<p:outputLabel for="descricaoo" value="Descricao:" />
+					<p:inputText id="descricaoo"
+						value="#{MBTipoFormaPagamento.tipoFormaPagamento.descricao}"
+						size="50" maxlength="40" required="true"
+						requiredMessage="O campo descrição é obrigatório"
+						title="Digite a descrição do tipo de forma de Pagamento">
+						<p:watermark for="descricaoo" value="Ex: Cartão de Credito Visa" />
+					</p:inputText>
+
+					<p:outputLabel for="formaPagamento" value="Forma de Pagamento:" />
+					<p:selectOneMenu id="formaPagamento" filter="true"
+						value="#{MBTipoFormaPagamento.tipoFormaPagamento.formaPagamento.idFormaPagamento}"
+						required="true"
+						requiredMessage="O campo forma de Pagamento é obrigatório .">
+
+						<f:selectItem itemLabel="Selecione uma forma de Pagamento " />
+
+						<f:selectItems var="item"
+							value="#{MBTipoFormaPagamento.comboFormaPagamento}"
+							itemValue="#{item.idFormaPagamento}"
+							itemLabel="#{item.descricao}" />
+
+
+					</p:selectOneMenu>
+
+				</h:panelGrid>
+				<br />
+				<font color="red"> <h:outputText value="*" />
+				</font>
+				<h:outputLabel value="Indica campo requerido" />
+				<center>
+
+					<p:commandButton value="Salvar" icon="ui-icon-check"
+						actionListener="#{MBTipoFormaPagamento.salvar}"
+						oncomplete="verificar2(xhr, status, args, 'dlgTipoFormaPagNovo', 'tabelaTipoFormaPagListagem' )"
+						update=":frmTipoFormaPagListagem:tblTipoFormaPagListagem :frmTipoFormaPagNovo :msgGlobal" />
+
+					<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+						oncomplete="PF('dlgTipoFormaPagNovo').hide();" ajax="true">
+
+					</p:commandButton>
+
+				</center>
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgTipoFormaPagEditar" closable="true"
+			draggable="false" resizable="false"
+			header="Tipo Forma de Pagamento - Editar" appendTo="@(body)"
+			modal="true">
+			<h:form id="frmTipoFormaPagamentoEditar">
+				<h:panelGrid id="pnlTipoFormaPagamentoEditar" columns="2">
+
+					<p:outputLabel for="descricaoo" value="Descricao:" />
+					<p:inputText id="descricaoo"
+						value="#{MBTipoFormaPagamento.tipoFormaPagamento.descricao}"
+						size="50" maxlength="40" required="true"
+						requiredMessage="O campo descrição é obrigatório"
+						title="Digite a descrição do tipo de forma de Pagamento" />
+
+					<p:outputLabel for="formaPagamento" value="Forma de Pagamento:" />
+					<p:selectOneMenu id="formaPagamento" filter="true"
+						value="#{MBTipoFormaPagamento.tipoFormaPagamento.formaPagamento.idFormaPagamento}"
+						required="true"
+						requiredMessage="O campo forma de Pagamento é obrigatório .">
+
+						<f:selectItem itemLabel="Selecione uma forma de Pagamento " />
+
+						<f:selectItems var="item"
+							value="#{MBTipoFormaPagamento.comboFormaPagamento}"
+							itemValue="#{item.idFormaPagamento}"
+							itemLabel="#{item.descricao}" />
+					</p:selectOneMenu>
+
+				</h:panelGrid>
+
+				<br />
+				<font color="red"> <h:outputText value="*" />
+				</font>
+				<h:outputLabel value="Indica campo requerido" />
+				<center>
+					<p:commandButton value="Editar" icon="ui-icon-check"
+						actionListener="#{MBTipoFormaPagamento.editar}"
+						oncomplete="verificar(xhr, status, args, 'dlgTipoFormaPagEditar', 'tabelaTipoFormaPagListagem' )"
+						update=":frmTipoFormaPagListagem:tblTipoFormaPagListagem :frmTipoFormaPagamentoEditar :msgGlobal" />
+
+					<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+						oncomplete="PF('dlgTipoFormaPagEditar').hide();" ajax="true">
+						<p:resetInput
+							target=":frmTipoFormaPagamentoEditar:pnlTipoFormaPagamentoEditar" />
+					</p:commandButton>
+				</center>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgTipoFormaPagExcluir" closable="true"
+			draggable="false" resizable="false"
+			header="Tipo Forma de Pagamento - Excluir" appendTo="@(body)"
+			modal="true">
+			<h:form id="frmTipoFormaPagExcluir">
+				<h:panelGrid id="pnlTipoFormaPagExcluir" columns="2">
+					<p:outputLabel value="Descricao:" />
+					<p:outputLabel
+						value="#{MBTipoFormaPagamento.tipoFormaPagamento.descricao}"
+						size="50" maxlength="40" />
+
+					<p:outputLabel value="Forma de Pagamento:" />
+					<p:outputLabel
+						value="#{MBTipoFormaPagamento.tipoFormaPagamento.formaPagamento.descricao}"
+						size="50" maxlength="40" />
+
+
+				</h:panelGrid>
+
+				<center>
+
+					<p:commandButton value="Excluir" icon="ui-icon-check"
+						actionListener="#{MBTipoFormaPagamento.excluir}"
+						oncomplete="verificar(xhr, status, args, 'dlgTipoFormaPagExcluir', 'tabelaTipoFormaPagListagem')"
+						update=":frmTipoFormaPagListagem:tblTipoFormaPagListagem  :msgGlobal" />
+
+					<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+						oncomplete="PF('dlgTipoFormaPagExcluir').hide();" ajax="true">
+
+					</p:commandButton>
+
+				</center>
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+
+</ui:composition>

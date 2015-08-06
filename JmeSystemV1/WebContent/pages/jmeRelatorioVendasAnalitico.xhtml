@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<!-- 		Serve para carregar a listagem  preRenderView a função é de antes da tela abrir ele carrega a listagem do comboBox-->
+		<f:event listener="#{MBRelatorioVendas.carregarListagem}"
+			type="preRenderView" />
+
+		<h:form id="frmRelatorioVendas">
+			<center>
+				<p:panel header="Relatório Análitico - Vendas">
+
+					<h:panelGrid columns="4" id="pnlRelatorioVendas">
+						<p:outputLabel value="Data: " />
+						<p:calendar locale="pt"
+							value="#{MBRelatorioVendasAnalitico.dataInicial}"
+							title="Intervalo Inicial: Data da venda" showOn="button"
+							id="maskDataInicial" pattern="dd/MM/yyyy" mask="true">
+							<p:watermark for="maskDataInicial" value="30/12/1992" />
+						</p:calendar>
+
+						<p:outputLabel value="a" />
+
+						<p:calendar locale="pt"
+							value="#{MBRelatorioVendasAnalitico.dataFinal}"
+							title="Intervalo Final: Data da venda" showOn="button"
+							id="maskDataFinal" pattern="dd/MM/yyyy" mask="true">
+							<p:watermark for="maskDataFinal" value="30/12/1992" />
+						</p:calendar>
+
+						<p:outputLabel value="Tipo Relatório: " />
+						<p:selectOneMenu filter="true"
+							value="#{MBRelatorioVendasAnalitico.tipoRelatorio}">
+
+							<f:selectItem itemValue="1" itemLabel="1 - NORMAL" />
+							<f:selectItem itemValue="2" itemLabel="2 - GRÁFICO EM BARRAS" />
+							<f:selectItem itemValue="3" itemLabel="3 - GRÁFICO DE PIZZA" />
+
+						</p:selectOneMenu>
+						<h:outputText />
+						<h:outputText />
+
+						<h:outputText value="Agrupar: *" />
+						<p:selectOneRadio requiredMessage="O campo agrupar é obrigatório" required="true" value="#{MBRelatorioVendasAnalitico.agrupar}">
+							<f:selectItem itemLabel="Mensal" itemValue="1" />
+							<f:selectItem itemLabel="Anual" itemValue="2" />
+						</p:selectOneRadio>
+
+						<h:outputText />
+						<h:outputText />
+
+					</h:panelGrid>
+
+
+
+					<h:panelGrid columns="1">
+						<p:commandButton ajax="false" value="Gerar Relatório"
+							actionListener="#{MBRelatorioVendasAnalitico.validacaoRelatorio()}" />
+					</h:panelGrid>
+
+				</p:panel>
+			</center>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

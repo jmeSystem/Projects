@@ -1,0 +1,33 @@
+package br.com.jmesystemv1.test;
+
+import java.util.Date;
+
+import br.com.jmesystemv1.dao.JmeClienteDAO;
+import br.com.jmesystemv1.domain.JmeCidade;
+import br.com.jmesystemv1.domain.JmeCliente;
+
+public class JmeClienteTest {
+
+	public static void main(String[] args) {
+
+		JmeClienteDAO dao = new JmeClienteDAO();
+		JmeCidade cid = new JmeCidade();		
+		
+		cid.setIdCidade(1);
+		
+		JmeCliente cliente  = new JmeCliente();		
+		
+cliente.setCidade(cid);
+cliente.setCpf("1234");
+cliente.setDataCadastro(new Date());
+cliente.setDataNascimento(new Date());
+cliente.setEndereco("Rua Waldomiro");
+cliente.setInforComplementar("Trabalh");
+cliente.setNome("Mário Octávio Bu");
+cliente.setTelefone("43353");
+cliente.setTelefoneTrabalho("4335");
+
+dao.salvar(cliente);
+	}
+
+}

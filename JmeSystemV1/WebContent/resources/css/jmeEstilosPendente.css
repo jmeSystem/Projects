@@ -1,0 +1,7 @@
+@CHARSET "UTF-8";
+
+.linhaEstiloPendente{  
+background-color:#ffffff;    
+    color: #ff0000;
+    font-weight: bold;
+}  

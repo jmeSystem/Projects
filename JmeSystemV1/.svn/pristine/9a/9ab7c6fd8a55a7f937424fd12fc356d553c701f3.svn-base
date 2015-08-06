@@ -1,0 +1,20 @@
+package br.com.jmesystemv1.test;
+
+import java.util.List;
+
+import br.com.jmesystemv1.dao.JmeCidadeDAO;
+import br.com.jmesystemv1.domain.JmeCidade;
+
+public class JmeCidadeTest {
+
+	public static void main (String [] args){
+		
+		JmeCidadeDAO dao = new JmeCidadeDAO();
+		
+//		listar tudo
+	List<JmeCidade> cidades = dao.listar();
+		for(JmeCidade cidade : cidades ){
+	System.out.println(cidade);
+	}
+	}
+}

@@ -1,0 +1,66 @@
+package br.com.jmesystemv1.domain;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+<<<<<<< .mine
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+=======
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+>>>>>>> .r26
+import javax.persistence.Table;
+@Entity
+@Table(name="Cidade")
+@NamedQueries({ 
+	@NamedQuery(name="JmeCidade.listar", query="select cidade from JmeCidade cidade"),
+	@NamedQuery(name="JmeCidade.buscarPorCodigo", query="select cidade from JmeCidade cidade where cid_id =:idCidade")})
+public class JmeCidade {
+	@Id
+	// o campo codigo é a chave primária
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	// é auto incremento
+	@Column(name = "CID_ID")
+	private Integer idCidade;
+	
+	/*Chave estrangeira da tabela Estado, um Estado tem varias Cidades*/
+	/*Many= Muitas Cidades ficam em One=Estado*/
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name="CID_EST_UF", referencedColumnName="EST_UF", nullable=false)
+	private JmeEstado estado;
+	
+	@Column(name="CID_NOME")
+	private String nome;
+	
+	
+	public Integer getIdCidade() {
+		return idCidade;
+	}
+	public void setIdCidade(Integer idCidade) {
+		this.idCidade = idCidade;
+	}
+	public String getNome() {
+		return nome;
+	}
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+	
+	public JmeEstado getEstado() {
+		return estado;
+	}
+	public void setEstado(JmeEstado estado) {
+		this.estado = estado;
+	}
+	@Override
+	public String toString() {
+		return "JmeCidade [idCidade=" + idCidade + ", nome=" + nome + ", estado="+ estado +"]";
+	}
+	
+	
+
+}

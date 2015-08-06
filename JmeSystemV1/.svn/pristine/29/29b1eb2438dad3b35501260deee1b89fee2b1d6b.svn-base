@@ -1,0 +1,36 @@
+package br.com.jmesystemv1.dao;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import br.com.jmesystemv1.domain.JmeCliente;
+import br.com.jmesystemv1.util.HibernateUtil;
+
+public class JmeClienteDAO {
+
+	public void salvar(JmeCliente cliente) { // throws Exception quem chamar
+												// esse metodo vai ser obrigado
+												// a tratar o erro
+
+		// pegar uma sessão para conseguir fazer as operações no banco de dados
+
+		Session sessao = HibernateUtil.getSessionFactory().openSession();
+		Transaction transacao = null; // quando for start a transação pode dar
+										// erro
+
+		try {
+
+			transacao = sessao.beginTransaction();
+			sessao.save(cliente);
+			transacao.commit(); // confirma a transação
+		} catch (RuntimeException ex) {
+			// se for diferente de null e desfaz toda trasação
+			if (transacao != null) {
+				transacao.rollback();// desfazer toda a transação
+			}
+
+		} finally {
+			sessao.close();
+		}
+	}
+}

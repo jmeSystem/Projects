@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define  name="conteudo">
+		<f:event listener="#{MBProduto.init()}" type="preRenderView" />
+		<h:form id="formProPrincipal">
+			<p:dataTable id="tabelaProdutos" widgetVar="tblProduto" value="#{MBProduto.listaProdutos}"
+				var="item" paginator="true" rows="2">
+				<p:column headerText="ID">
+					<h:outputText value="#{item.idProduto}" />
+				</p:column>
+				<p:column headerText="COD">
+					<h:outputText value="#{item.codProduto}" /> 
+				</p:column>
+				<p:column headerText="DESCRIÇÃO">
+					<h:outputText value="#{item.descricao}" />
+				</p:column>
+				<p:column headerText="EST. MAX">
+					<h:outputText value="#{item.estoqueMax}" />
+				</p:column>
+				<p:column headerText="EST. MIN">
+					<h:outputText value="#{item.estoqueMin}" />
+				</p:column>
+				<p:column headerText="MODELO">
+					<h:outputText value="#{item.modelo}" />
+				</p:column>
+				<p:column headerText="MARCA">
+					<h:outputText value="#{item.marca}" />
+				</p:column>
+				<p:column headerText="VALOR UNIT.">
+					<h:outputText value="#{item.valorUnitario}" />
+				</p:column>
+				<p:column headerText="QUANT. ESTOQUE">
+					<h:outputText value="#{item.quantEstoque}" />
+				</p:column>
+
+				<p:column>
+					<p:commandButton icon="ui-icon-pencil" oncomplete="PF('dlgEditar').show()" update=":formEditar" >
+						<f:setPropertyActionListener value="#{item}"
+							target="#{MBProduto.produto}" />
+					</p:commandButton>
+				</p:column>
+
+				<p:column>
+					<p:commandButton icon="ui-icon-trash" oncomplete="PF('dlgExclu').show()" update=":formExclu">						
+						<f:setPropertyActionListener value="#{item}"
+							target="#{MBProduto.produtoSelecionado}" />
+					</p:commandButton>
+				</p:column>
+
+			</p:dataTable>
+			<center style="margin-top: 5px">
+				<p:commandButton value="Novo" oncomplete="PF('dlgExcluir').show()" 
+								 update=":formExcluir"  action="#{MBProduto.preparaInserirNovo()}" />
+			</center>
+		</h:form>
+		<!-- 		Dialog Novo -->
+		<p:dialog header="Inserir Produto" widgetVar="dlgExcluir">
+			<h:form id="formExcluir">
+				<h:panelGrid columns="2">
+					<p:outputLabel value="ID:" />
+					<p:inputText size="15" readonly="true"
+						value="#{MBProduto.produto.idProduto}" />
+					<p:outputLabel value="Codigo:" />
+					<p:inputText size="15" value="#{MBProduto.produto.codProduto}" />
+					<p:outputLabel value="Cod Fornecedor:" />
+					<p:inputText size="15" value="#{MBProduto.produto.codFornecedor}" />
+					<p:outputLabel value="Descrição:" />
+					<p:inputText  size="50" value="#{MBProduto.produto.descricao}" />
+					<p:outputLabel value="Estoque MAX: " />
+					<p:inputText size="15" value="#{MBProduto.produto.estoqueMax}" />
+					<p:outputLabel value="Estoque MIN:" />
+					<p:inputText size="15" value="#{MBProduto.produto.estoqueMin}" />
+					<p:outputLabel value="Modelo:" />
+					<p:inputText size="30" value="#{MBProduto.produto.modelo}" />
+					<p:outputLabel value="Marca:" />
+					<p:inputText size="30" value="#{MBProduto.produto.marca}" />
+					<p:outputLabel value="Valor Unit.: " />
+					<p:inputText size="15" value="#{MBProduto.produto.valorUnitario}" />
+					<p:outputLabel value="Quant. Estoque:" />
+					<p:inputText size="15" value="#{MBProduto.produto.quantEstoque}" />
+				</h:panelGrid>
+				<center>
+					<p:commandButton value="Salvar"
+						actionListener="#{MBProduto.salvar()}"
+						oncomplete="PF('dlgExcluir').hide()"
+						update=":formProPrincipal:tabelaProdutos :msgGlobal" />					
+					<p:commandButton value="Voltar"
+						oncomplete="PF('dlgExcluir').hide()" />
+				</center>
+			</h:form>
+		</p:dialog>
+
+<!-- dialog excluir -->
+		<p:dialog header="Excluir Produto" widgetVar="dlgExclu">
+			<h:form id="formExclu">
+				<h:panelGrid columns="2">
+					<p:outputLabel value="ID:" />
+					<p:inputText size="15" readonly="true"
+						value="#{MBProduto.produtoSelecionado.idProduto}" />
+					<p:outputLabel value="Codigo:" />
+					<p:inputText readonly="true" size="15" value="#{MBProduto.produtoSelecionado.codProduto}" />
+					<p:outputLabel value="Cod Fornecedor:" />
+					<p:inputText readonly="true" size="15" value="#{MBProduto.produtoSelecionado.codFornecedor}" />
+					<p:outputLabel value="Descrição:" />
+					<p:inputText readonly="true" size="50" value="#{MBProduto.produtoSelecionado.descricao}" />
+					<p:outputLabel value="Estoque MAX: " />
+					<p:inputText readonly="true" size="15" value="#{MBProduto.produtoSelecionado.estoqueMax}" />
+					<p:outputLabel value="Estoque MIN:" />
+					<p:inputText readonly="true" size="15" value="#{MBProduto.produtoSelecionado.estoqueMin}" />
+					<p:outputLabel value="Modelo:" />
+					<p:inputText readonly="true" size="30" value="#{MBProduto.produtoSelecionado.modelo}" />
+					<p:outputLabel value="Marca:" />
+					<p:inputText readonly="true" size="30" value="#{MBProduto.produtoSelecionado.marca}" />
+					<p:outputLabel value="Valor Unit.: " />
+					<p:inputText readonly="true" size="15" value="#{MBProduto.produtoSelecionado.valorUnitario}" />
+					<p:outputLabel value="Quant. Estoque:" />
+					<p:inputText readonly="true" size="15" value="#{MBProduto.produtoSelecionado.quantEstoque}" />
+				</h:panelGrid>
+				<center>
+					<p:commandButton value="Calcelar"
+						oncomplete="PF('dlgExclu').hide()" />
+					<p:commandButton value="Excluir"
+						actionListener="#{MBProduto.exluir()}" update=":formProPrincipal :msgGlobal"  oncomplete="PF('dlgExclu').hide()" />
+				</center>
+			</h:form>
+
+<!-- dialog editar -->
+		</p:dialog>
+		<p:dialog header="Alterar Produto" widgetVar="dlgEditar">
+			<h:form id="formEditar">
+				<h:panelGrid columns="2">
+					<p:outputLabel value="ID:" />
+					<p:inputText size="15" readonly="true"
+						value="#{MBProduto.produto.idProduto}" />
+					<p:outputLabel value="Codigo:" />
+					<p:inputText size="10" value="#{MBProduto.produto.codProduto}" />
+					<p:outputLabel value="Cod Fornecedor:" />
+					<p:inputText size="15" value="#{MBProduto.produto.codFornecedor}" />
+					<p:outputLabel value="Descrição:" />
+					<p:inputText size="50" value="#{MBProduto.produto.descricao}" />
+					<p:outputLabel value="Estoque MAX: " />
+					<p:inputText size="15" value="#{MBProduto.produto.estoqueMax}" />
+					<p:outputLabel value="Estoque MIN:" />
+					<p:inputText size="15" value="#{MBProduto.produto.estoqueMin}" />
+					<p:outputLabel value="Modelo:" />
+					<p:inputText size="30" value="#{MBProduto.produto.modelo}" />
+					<p:outputLabel value="Marca:" />
+					<p:inputText size="30" value="#{MBProduto.produto.marca}" />
+					<p:outputLabel value="Valor Unit.: " />
+					<p:inputText size="15" value="#{MBProduto.produto.valorUnitario}" />
+					<p:outputLabel value="Quant. Estoque:" />
+					<p:inputText size="15" value="#{MBProduto.produto.quantEstoque}" />
+				</h:panelGrid>
+				<center>
+					<p:commandButton value="Calcelar"
+						oncomplete="PF('dlgEditar').hide()" />
+					<p:commandButton value="Alterar" action="#{MBProduto.preparaInserirNovo()}"
+						actionListener="#{MBProduto.editar()}" update=":formProPrincipal:tabelaProdutos :msgGlobal" oncomplete="PF('dlgEditar').hide()"  />
+				</center>
+			</h:form>
+
+			
+		</p:dialog>
+
+
+	</ui:define>
+
+</ui:composition>

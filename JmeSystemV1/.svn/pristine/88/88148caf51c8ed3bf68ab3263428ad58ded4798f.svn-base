@@ -1,0 +1,40 @@
+package br.com.jmesystemv1.test;
+
+
+import br.com.jmesystemv1.dao.JmeFuncionarioDAO;
+import br.com.jmesystemv1.domain.JmeCidade;
+import br.com.jmesystemv1.domain.JmeFuncionario;
+
+public class JmeFuncionarioTest {
+
+	public static void main(String args[]) {
+
+		JmeFuncionarioDAO dao = new JmeFuncionarioDAO();
+		JmeFuncionario fun = new JmeFuncionario();
+		JmeCidade cidade = new JmeCidade();
+		
+		//Salvar
+		// fun.setCidade(cidade);
+		// cidade.setIdCidade(1);
+		// fun.setNome("Mário");
+		// fun.setEndereço("Rua");
+		// fun.setRg("10290");
+		// fun.setTelefone("433");
+		//
+		//
+		// dao.salvar(fun);
+
+		//Listar
+		// List<JmeFuncionario> funcionarios = dao.listar();
+		//
+		// for (JmeFuncionario lista : funcionarios) {
+		// System.out.println(lista);
+		//
+		// }
+		
+		
+		
+		
+	}
+
+}

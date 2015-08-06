@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<f:event listener="#{MBFornecedor.listagem()}" type="preRenderView" />
+		<h:form id="frmForListagem">
+			<p:dataTable id="tblFornecedor" widgetVar="tabelaFornecedor"
+				emptyMessage="Nenhum registro encontrado."
+				value="#{MBFornecedor.itens}" var="item"
+				filteredValue="#{MBFornecedor.itensFiltrados}" paginator="true"
+				rows="10">
+
+				<f:facet name="header">
+					<h:outputText value="Fornecedor - Listagem" />
+				</f:facet>
+
+				<p:column exportable="false" headerText="Data Cadastro"
+					sortBy="#{item.dataCadastro}" filterBy="#{item.dataCadastro}">
+					<h:outputText value="#{item.dataCadastro}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+
+				</p:column>
+				<p:column sortBy="#{item.razaoSocial}"
+					filterBy="#{item.razaoSocial}">
+					<f:facet name="header">
+						<h:outputText value="Razão Social" />
+					</f:facet>
+					<h:outputText value="#{item.razaoSocial}" />
+				</p:column>
+				<p:column headerText="CNPJ" exportable="false" sortBy="#{item.cnpj}"
+					filterBy="#{item.cnpj}">
+					<h:outputText value="#{item.cnpj}" />
+				</p:column>
+				<p:column sortBy="#{item.nomeFantasia}"
+					filterBy="#{item.nomeFantasia}">
+					<f:facet name="header">
+						<h:outputText value="Nome Fantasia" />
+					</f:facet>
+					<h:outputText value="#{item.nomeFantasia}" />
+				</p:column>
+				<p:column sortBy="#{item.telefoneFixo}"
+					filterBy="#{item.telefoneFixo}">
+					<f:facet name="header">
+						<h:outputText value="Tel.Fixo" />
+					</f:facet>
+					<h:outputText value="#{item.telefoneFixo}" />
+				</p:column>
+				<p:column exportable="false" headerText="EMAIL"
+					sortBy="#{item.email}" filterBy="#{item.email}">
+					<h:outputText value="#{item.email}" />
+				</p:column>
+				<p:column exportable="false" headerText="Endereço"
+					sortBy="#{item.endereco}" filterBy="#{item.endereco}">
+					<h:outputText value="#{item.endereco}" />
+				</p:column>
+				<p:column exportable="false" headerText="Cidade"
+					sortBy="#{item.jmeCidade.nome}" filterBy="#{item.jmeCidade.nome}">
+					<h:outputText value="#{item.jmeCidade.nome}" />
+				</p:column>
+
+				<p:column exportable="false" headerText="Opções">
+					<p:commandButton icon="ui-icon-trash" title="Excluir"
+						oncomplete="PF('dlgFornecedorExcluir').show();"
+						update=":frmFornecedorExcluir:FornecedorExcluir">
+						<f:setPropertyActionListener
+							target="#{MBFornecedor.fornecedorBean}" value="#{item}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-pencil" title="Editar"
+						actionListener="#{MBFornecedor.prepararEditar()}"
+						oncomplete="PF('dlgFornecedorEditar').show();"
+						update=":frmFornecedorEditar:FornecedorEditar">
+						<f:setPropertyActionListener
+							target="#{MBFornecedor.fornecedorBean}" value="#{item}" />
+
+
+					</p:commandButton>
+				</p:column>
+
+				<f:facet name="footer">
+					<p:commandButton icon="ui-icon-document" value="Novo"
+						title="Fornecedor: Novo"
+						actionListener="#{MBFornecedor.prepararNovo()}"
+						oncomplete="PF('dlgFornecedorNovo').show();"
+						update=":frmFornecedorNovo:FornecedorNovo">
+						<p:resetInput target=":frmFornecedorNovo:FornecedorNovo" />
+					</p:commandButton>
+
+				</f:facet>
+			</p:dataTable>
+
+			<!-- 			imagem que gera a exportação a partir dos dados da tabela -->
+			<h3>Export</h3>
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para pdf"
+					style="height: 30px" value="/imagens/Adobe_PDF_icon.png" />
+				<p:dataExporter encoding="iso-8859-1" type="pdf"
+					target="tblFornecedor" fileName="carregarListagem" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para excel"
+					style="height: 30px" value="/imagens/excel.png" />
+				<p:dataExporter type="xls" target="tblFornecedor"
+					fileName="carregarListagem" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para csv"
+					style="height: 30px" value="/imagens/csv.png" />
+				<p:dataExporter type="csv" target="tblFornecedor"
+					fileName="carregarListagem" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para xml"
+					style="height: 30px" value="/imagens/xml.png" />
+				<p:dataExporter type="xml" target="tblFornecedor"
+					fileName="carregarListagem" />
+			</p:commandLink>
+		</h:form>
+
+		<p:dialog widgetVar="dlgFornecedorNovo" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Fornecedor - Novo">
+
+			<h:form id="frmFornecedorNovo">
+				<h:panelGrid id="FornecedorNovo" columns="2">
+
+					<p:outputLabel value="Data Cadastro: *" />
+					<p:calendar id="data" showOn="button" locale="pt"
+						title="Exibe o calendário"
+						value="#{MBFornecedor.fornecedorBean.dataCadastro}"
+						required="true"
+						requiredMessage="O campo Data Cadastro é obrigatório" />
+
+					<p:outputLabel for="cidade" value="Cidade:" />
+					<p:selectOneMenu id="cidade" filter="true"
+						value="#{MBFornecedor.fornecedorBean.jmeCidade.idCidade}"
+						effect="fade" style="width:230px" required="true"
+						requiredMessage="O campo cidade é obrigatório">
+
+						<f:selectItem itemLabel="Selecione uma cidade" />
+						<f:selectItems value="#{MBFornecedor.cidadeCombo}" var="item"
+							itemValue="#{item.idCidade}" itemLabel="#{item.nome}" />
+
+					</p:selectOneMenu>
+
+
+					<p:outputLabel value="Razão Social: *" />
+					<p:inputText size="50" maxlength="50"
+						value="#{MBFornecedor.fornecedorBean.razaoSocial}" />
+
+					<p:outputLabel value="CNPJ: *" />
+					<p:inputMask id="cnpj" mask="99.999.999/9999-99"
+						value="#{MBFornecedor.fornecedorBean.cnpj}" />
+
+					<p:outputLabel value="Nome Fantasia: *" />
+					<p:inputText size="30" maxlength="30"
+						value="#{MBFornecedor.fornecedorBean.nomeFantasia}" />
+
+					<p:outputLabel value="Telefone Fixo: *" />
+					<p:inputMask id="telFixo" mask="(99) 9999-9999"
+						value="#{MBFornecedor.fornecedorBean.telefoneFixo}" />
+
+					<p:outputLabel value="EMAIL: *" />
+					<p:inputText size="30" maxlength="30"
+						value="#{MBFornecedor.fornecedorBean.email}" />
+
+					<p:outputLabel value="Endereço: *" />
+					<p:inputText size="50" maxlength="50"
+						value="#{MBFornecedor.fornecedorBean.endereco}" />
+
+					<p:outputLabel value="CEP: *" />
+					<p:inputMask size="10" mask="99999-999"
+						value="#{MBFornecedor.fornecedorBean.cep}" />
+
+					<p:outputLabel value="Caixa Postal:" />
+					<p:inputText size="5" maxlength="3"
+						value="#{MBFornecedor.fornecedorBean.caixaPostal}" />
+				</h:panelGrid>
+				<!-- 				Botões para salvar e cancelar -->
+				<br/>
+				<font color="red"> <h:outputText value="*" />
+				</font>
+				<h:outputLabel value="Indica campo requerido" />
+				<center>
+					<p:commandButton value="Salvar" icon="ui-icon-check"
+						actionListener="#{MBFornecedor.novo}"
+						oncomplete="verificar2(xhr, status, args, 'dlgFornecedorNovo', 'tabelaFornecedor' )"
+						update=":frmForListagem:tblFornecedor :frmFornecedorNovo :msgGlobal" />
+
+					<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+						onclick="PF('dlgFornecedorNovo').hide();" />
+				</center>
+
+
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgFornecedorExcluir" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Fornecedor - Excluir">
+
+			<h:form id="frmFornecedorExcluir">
+				<h:panelGrid id="FornecedorExcluir" columns="2">
+					<p:outputLabel value="Codigo.:" />
+					<h:outputText value="#{MBFornecedor.fornecedorBean.idFornecedor}" />
+
+					<p:outputLabel value="Razão Social.:" />
+					<h:outputText value="#{MBFornecedor.fornecedorBean.razaoSocial}" />
+
+					<p:outputLabel value="CNPJ.:" />
+					<h:outputText value="#{MBFornecedor.fornecedorBean.cnpj}" />
+
+
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir" icon="ui-icon-check"
+						actionListener="#{MBFornecedor.excluir()}"
+						oncomplete="verificar(xhr, status, args, 'dlgFornecedorExcluir', 'tabelaFornecedor' )"
+						update=":msgGlobal :frmForListagem:tblFornecedor" />
+
+					<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+						onclick="PF('dlgFornecedorExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgFornecedorEditar" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Fornecedor - Editar">
+
+			<h:form id="frmFornecedorEditar">
+				<h:panelGrid id="FornecedorEditar" columns="2">
+					<p:outputLabel value="Código:" />
+					<h:outputText value="#{MBFornecedor.fornecedorBean.idFornecedor}" />
+
+					<p:outputLabel for="cidadee" value="Cidade: *" />
+					<p:selectOneMenu id="cidadee" filter="true"
+						value="#{MBFornecedor.fornecedorBean.jmeCidade.idCidade}"
+						effect="fade" style="width:230px">
+
+						<f:selectItem itemLabel="Selecione uma cidade" />
+						<f:selectItems value="#{MBFornecedor.cidadeCombo}" var="item"
+							itemValue="#{item.idCidade}" itemLabel="#{item.nome}" />
+
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Razão Social: *" />
+					<p:inputText value="#{MBFornecedor.fornecedorBean.razaoSocial}"
+						size="50" maxlength="50" />
+
+					<p:outputLabel value="CPNJ: *" />
+					<p:inputMask id="cnpj" mask="99.999.999/9999-99"
+						value="#{MBFornecedor.fornecedorBean.cnpj}" />
+
+					<p:outputLabel value="Nome Fantasia: *" />
+					<p:inputText size="30" maxlength="30"
+						value="#{MBFornecedor.fornecedorBean.nomeFantasia}" />
+
+					<p:outputLabel value="Telefone Fixo: *" />
+					<p:inputMask id="telFixo" mask="(99) 9999-9999"
+						value="#{MBFornecedor.fornecedorBean.telefoneFixo}" />
+
+					<p:outputLabel value="EMAIL: *" />
+					<p:inputText size="30" maxlength="30"
+						value="#{MBFornecedor.fornecedorBean.email}" />
+
+					<p:outputLabel value="Endereço: *" />
+					<p:inputText size="50" maxlength="50"
+						value="#{MBFornecedor.fornecedorBean.endereco}" />
+
+					<p:outputLabel value="CEP: *" />
+					<p:inputMask size="10" mask="99999-999"
+						value="#{MBFornecedor.fornecedorBean.cep}" />
+
+					<p:outputLabel value="Caixa Postal:" />
+					<p:inputText size="5" maxlength="3"
+						value="#{MBFornecedor.fornecedorBean.caixaPostal}" />
+
+
+				</h:panelGrid>
+				<br/>
+				<font color="red"> <h:outputText value="*" />
+				</font>
+				<h:outputLabel value="Indica campo requerido" />
+				<center>
+					<p:commandButton value="Editar" icon="ui-icon-check"
+						actionListener="#{MBFornecedor.editar()}"
+						oncomplete="verificar(xhr, status, args, 'dlgFornecedorEditar', 'tabelaFornecedor' )"
+						update=":frmForListagem:tblFornecedor :msgGlobal" />
+
+					<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+						onclick="PF('dlgFornecedorEditar').hide();" />
+				</center>
+
+			</h:form>
+
+		</p:dialog>
+
+	</ui:define>
+
+</ui:composition>

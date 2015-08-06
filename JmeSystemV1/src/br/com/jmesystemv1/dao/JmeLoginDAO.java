@@ -1,0 +1,36 @@
+package br.com.jmesystemv1.dao;
+
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+
+import br.com.jmesystemv1.domain.JmeLogin;
+import br.com.jmesystemv1.util.HibernateUtil;
+
+public class JmeLoginDAO {
+	
+	/**
+	 * método reponsável por validar o login e a senha
+	 */
+	public JmeLogin validaLogin(String senha, String login){
+		
+		Session sessao = HibernateUtil.getSessionFactory().openSession();
+		JmeLogin jmeLogin = new JmeLogin();
+		
+		try {
+			
+			Query consulta = sessao.getNamedQuery("JmeLogin.validaLogin");
+			consulta.setString("login", login);
+			consulta.setString("senha", senha);
+			
+			jmeLogin = (JmeLogin) consulta.uniqueResult();
+			
+		} catch (RuntimeException ex) {
+			throw ex;
+
+		} finally {
+			sessao.close();
+		}
+		return jmeLogin;
+	}
+}

@@ -1,0 +1,49 @@
+package br.com.jmesystemv1.test;
+
+import java.util.Date;
+import java.util.List;
+
+import br.com.jmesystemv1.dao.JmeClienteDAO;
+import br.com.jmesystemv1.domain.JmeCidade;
+import br.com.jmesystemv1.domain.JmeCliente;
+
+public class JmeClienteTest {
+
+	public static void main(String[] args) {
+
+		JmeClienteDAO dao = new JmeClienteDAO();
+		JmeCidade cid = new JmeCidade();
+		
+
+		//salvar
+		//		cid.setIdCidade(1);
+//
+//		JmeCliente cliente = new JmeCliente();
+//
+//		cliente.setCidade(cid);
+//		cliente.setCpf("1234");
+//		cliente.setDataCadastro(new Date());
+//		cliente.setDataNascimento(new Date());
+//		cliente.setEndereco("Rua Waldomiro");
+//		cliente.setInforComplementar("Trabalh");
+//		cliente.setNome("Mário Octávio Bu");
+//		cliente.setTelefone("43353");
+//		cliente.setTelefoneTrabalho("4335");
+//
+//		dao.salvar(cliente);
+		
+		
+		// listar por codigo
+//		JmeCliente cliente = dao.buscarPorCodigo(12);
+//		
+//		System.out.println(cliente);
+		
+		
+//		listar tudo
+		List<JmeCliente> clientes = dao.listar();
+		for(JmeCliente cliente : clientes ){
+		System.out.println(cliente);
+		}
+	}
+
+}

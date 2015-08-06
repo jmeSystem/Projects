@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+
+	<ui:define name="conteudo">
+		<f:event listener="#{MBPrincipal.listarParcelasVencidas()}"
+			type="preRenderView" />
+
+		<p:panel header="Lembrete - Parcelas Vencidas">
+			<h:panelGrid columns="3">
+				<h:outputText style="font-weight: bold"
+					value="Total de Parcelas Vencidas: " />
+					
+				<h:outputText style="font-weight: bold"
+					value="#{MBPrincipal.totalVencidas}"
+					styleClass="#{MBPrincipal.totalVencidas>0 ? 'linhaEstiloPendente' : 'linhaEstiloPago'}" />
+					
+				<p:commandButton action="#{MBPrincipal.buscar()}" value="Exibir" icon="ui-icon-search"/>
+			</h:panelGrid>
+		</p:panel>
+
+		<center>
+			<p:panel header="Gerenciador de aplicativos Web JMEsytem">
+
+				<h:panelGrid>
+
+					<h:outputText
+						value="- Este módulo traduz a eficiência da solução integrada ao representar uma ferramenta" />
+					<h:outputText value="essencial na administração de acessos." />
+					<h:outputText
+						value="- Os conceitos de segurança, multi-acessos, controles consolidados, e outros, não teriam a mesma eficiência sem este aplicativo." />
+
+
+				</h:panelGrid>
+
+				<center>
+					<p:graphicImage value="/imagens/LogoFactory.jpg" />
+				</center>
+
+			</p:panel>
+		</center>
+
+
+	</ui:define>
+
+</ui:composition>

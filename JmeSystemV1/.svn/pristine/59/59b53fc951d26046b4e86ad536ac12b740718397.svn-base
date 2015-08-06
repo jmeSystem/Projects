@@ -1,0 +1,147 @@
+package br.com.jmesystemv1.domain;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+
+
+@Entity
+@Table(name="Fornecedor")
+@NamedQueries({
+	  @NamedQuery(name="JmeFornecedor.buscarPorCodigo", 
+			  	  query= "SELECT Fornecedor FROM JmeFornecedor Fornecedor WHERE FOR_ID=:idFornecedor"),
+	  @NamedQuery(name="JmeFornecedor.listar",
+			  	  query="SELECT Fornecedor FROM JmeFornecedor Fornecedor")})
+public class JmeFornecedor {
+	
+	/*Chave primaria do Fornecedor*/
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name="FOR_ID")
+	private Integer idFornecedor;
+	
+	@Temporal(value = TemporalType.DATE)
+	@Column(name="FOR_DATA_CADASTRO")
+	private Date dataCadastro;
+	
+	@Column(name="FOR_RAZAO_SOCIAL")
+	private String razaoSocial;
+	
+	@Column(name="FOR_CNPJ")
+	private String cnpj;
+	
+	@Column(name="FOR_NOME_FANTASIA")
+	private String nomeFantasia;
+	
+	@Column(name="FOR_TELEFONE_FIXO")
+	private String telefoneFixo;
+	
+	@Column(name="FOR_EMAIL")
+	private String email;
+	
+	@Column(name="FOR_ENDERECO")
+	private String endereco;
+	
+	@Column(name="FOR_CEP")
+	private String cep;
+	
+	@Column(name="FOR_CAIXA_POSTAL")
+	private Integer caixaPostal;
+	
+	/*Chave estrangeira da Cidade, uma Cidade tem varios Fornecedores*/
+	/*Many= Muitos fabricantes podem estar em One= Cidade*/
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name="FOR_CID_ID", referencedColumnName="CID_ID", nullable=false)
+	private JmeCidade cidade;
+	
+	
+	public Integer getIdFornecedor() {
+		return idFornecedor;
+	}
+	public void setIdFornecedor(Integer idFornecedor) {
+		this.idFornecedor = idFornecedor;
+	}
+	public Date getDataCadastro() {
+		return dataCadastro;
+	}
+	public void setDataCadastro(Date dataCadastro) {
+		this.dataCadastro = dataCadastro;
+	}
+	public String getRazaoSocial() {
+		return razaoSocial;
+	}
+	public void setRazaoSocial(String razaoSocial) {
+		this.razaoSocial = razaoSocial;
+	}
+	public String getCnpj() {
+		return cnpj;
+	}
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
+	}
+	public String getNomeFantasia() {
+		return nomeFantasia;
+	}
+	public void setNomeFantasia(String nomeFantasia) {
+		this.nomeFantasia = nomeFantasia;
+	}
+	public String getTelefoneFixo() {
+		return telefoneFixo;
+	}
+	public void setTelefoneFixo(String telefoneFixo) {
+		this.telefoneFixo = telefoneFixo;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getEndereco() {
+		return endereco;
+	}
+	public void setEndereco(String endereco) {
+		this.endereco = endereco;
+	}
+	public String getCep() {
+		return cep;
+	}
+	public void setCep(String cep) {
+		this.cep = cep;
+	}
+	public Integer getCaixaPostal() {
+		return caixaPostal;
+	}
+	public void setCaixaPostal(Integer caixaPostal) {
+		this.caixaPostal = caixaPostal;
+	}
+	public JmeCidade getJmeCidade() {
+		return cidade;
+	}
+	public void setJmeCidade(JmeCidade cidade) {
+		this.cidade = cidade;
+	}
+	
+
+	@Override
+	public String toString(){
+		return "JmeFornecedor[idFornecedor="+idFornecedor+", dataCadastro="+dataCadastro+
+				", razaoSocial="+razaoSocial+", cnpj="+cnpj+", nomeFantasia="+nomeFantasia+
+				", telefoneFixo="+telefoneFixo+", email="+email+", endereco="+endereco+
+				", cep="+cep+", caixaPostal="+caixaPostal+", cidade="+cidade+"]";
+	}
+
+}

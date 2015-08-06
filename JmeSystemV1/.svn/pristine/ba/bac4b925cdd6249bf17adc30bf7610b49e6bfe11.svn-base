@@ -1,0 +1,176 @@
+package br.com.jmesystemv1.bean;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+
+import br.com.jmesystemv1.dao.JmeFornecedorDAO;
+import br.com.jmesystemv1.dao.JmeProdutoDAO;
+import br.com.jmesystemv1.domain.JmeFornecedor;
+import br.com.jmesystemv1.domain.JmeProduto;
+import br.com.jmesystemv1.util.JSFUtil;
+
+/**
+ * 
+ * @author Jos� Wilian
+ * 
+ *         Classe respons�vel por gerenciar a tela de Produtos
+ */
+@ManagedBean(name = "MBProduto")
+@ViewScoped
+public class JmeProdutoBean implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private List<JmeProduto> itensFiltrados;
+	private List<JmeProduto> listaProdutos;
+	private JmeProduto produto = new JmeProduto();
+	private JmeProduto produtoSelecionado = new JmeProduto();
+	private List<JmeFornecedor> listaFornecedores;
+
+	/**
+	 * M�todo reponsavel por carregar informa��es na abertura da pagina
+	 */
+	public void init() {
+
+		this.listar();
+
+		JmeFornecedorDAO dao = new JmeFornecedorDAO();
+		listaFornecedores = dao.listar();
+
+	}
+
+	/**
+	 * M�todo Responsavel por preparar para inserir um novo produto
+	 */
+	public void preparaInserirNovo() {
+
+		produto = new JmeProduto();
+
+	}
+
+	/**
+	 * M�todo responsavel por salvar dados no banco
+	 */
+	public void salvar() {
+		JmeProdutoDAO dao = new JmeProdutoDAO();
+
+		try {
+			
+			Date dataAtual = new Date();
+			
+			produto.setDataCadastro(dataAtual);
+			produto.setQuantEstoque(0);
+			
+			dao.salvar(produto);
+			JSFUtil.adicionarMensagemSucesso("Produto Inserido com sucesso!");
+		} catch (Exception e) {
+			JSFUtil.adicionarMensagemErro("Erro ao inserir Produto");
+		}
+	}
+
+	/**
+	 * M�todo responsavel por listar todos os produtos cadastrados
+	 */
+	public void listar() {
+		JmeProdutoDAO dao = new JmeProdutoDAO();
+
+		try {
+
+			listaProdutos = new ArrayList<JmeProduto>();
+
+			listaProdutos = dao.listar();
+
+		} catch (Exception e) {
+			JSFUtil.adicionarMensagemErro("Erro ao listar Pordutos!");
+		}
+	}
+
+	/**
+	 * M�todo Responsavel por excluir um produto selecionado
+	 * */
+
+	public void exluir() {
+
+		JmeProdutoDAO dao = new JmeProdutoDAO();
+
+		try {
+
+			dao.excluir(produtoSelecionado.getIdProduto());
+			this.listar();
+
+			JSFUtil.adicionarMensagemSucesso("Excluido com sucesso!!");
+
+		} catch (Exception e) {
+			JSFUtil.adicionarMensagemErro("Erro ao excluir o produto");
+		}
+	}
+
+	/***
+	 * M�todo resposavel por editar um produto
+	 */
+	public void editar() {
+
+		JmeProdutoDAO dao = new JmeProdutoDAO();
+
+		try {
+
+			dao.editar(produto);
+
+			JSFUtil.adicionarMensagemSucesso("Alterado com sucesso!!");
+
+		} catch (Exception e) {
+			JSFUtil.adicionarMensagemErro("Erro ao alterar o produto");
+		}
+	}
+
+	/* =======================GET-SET================= */
+
+	public List<JmeProduto> getListaProdutos() {
+		return listaProdutos;
+	}
+
+	public void setListaProdutos(List<JmeProduto> listaProdutos) {
+		this.listaProdutos = listaProdutos;
+	}
+
+	public List<JmeFornecedor> getListaFornecedores() {
+		return listaFornecedores;
+	}
+
+	public void setListaFornecedores(List<JmeFornecedor> listaFornecedores) {
+		this.listaFornecedores = listaFornecedores;
+	}
+
+	public List<JmeProduto> getItensFiltrados() {
+		return itensFiltrados;
+	}
+
+	public void setItensFiltrados(List<JmeProduto> itensFiltrados) {
+		this.itensFiltrados = itensFiltrados;
+	}
+
+	public JmeProduto getProduto() {
+		return produto;
+	}
+
+	public void setProduto(JmeProduto produto) {
+		this.produto = produto;
+	}
+
+	public JmeProduto getProdutoSelecionado() {
+		return produtoSelecionado;
+	}
+
+	public void setProdutoSelecionado(JmeProduto produtoSelecionado) {
+		this.produtoSelecionado = produtoSelecionado;
+	}
+
+}

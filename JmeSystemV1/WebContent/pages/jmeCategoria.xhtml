@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<!-- 		Serve para carregar a listagem  preRenderView a função é de antes da tela abrir ele carrega a listagem-->
+		<f:event listener="#{MBCategoria.carregarListagem}"
+			type="preRenderView" />
+
+
+		<h:form id="frmCatListagem">
+			<p:dataTable id="tblCatListagem" widgetVar="tabelaCatListagem"
+				var="item" emptyMessage="Nenhum registro encontrado."
+				value="#{MBCategoria.listagemCategoria}"
+				filteredValue="#{MBCategoria.itensFiltrados}" paginator="true"
+				rows="7" style="margin-bottom:20px">
+
+				<!-- 				Cabeçalho da tabela -->
+				<f:facet name="header">
+					<h:outputText value="Categoria - Listagem" />
+				</f:facet>
+
+				<!--tirei o heaerText e acrescentei o facet, porque(pois para importa relatorio apartir da pesquisa  
+				eo nome do cabeçalho ser exportado junto, precisei acrescentar a tag f:facet) -->
+				<p:column filterBy="#{item.codigo}" sortBy="#{item.codigo}">
+					<f:facet name="header">
+						<h:outputText value="Código" />
+					</f:facet>
+					<h:outputText value="#{item.codigo}" />
+				</p:column>
+
+				<p:column filterBy="#{item.descricao}" sortBy="#{item.descricao}">
+					<f:facet name="header">
+						<h:outputText value="Descricao" />
+					</f:facet>
+					<h:outputText value="#{item.descricao}" />
+				</p:column>
+
+
+				<p:column style="width: 6%" exportable="false" headerText="Opções">
+
+					<p:commandButton icon="ui-icon-trash" title="Excluir"
+						oncomplete="PF('dlgCatExcluir').show();"
+						update=":frmCatExcluir:pnlCatExcluir">
+						<f:setPropertyActionListener target="#{MBCategoria.categoria}"
+							value="#{item}" />
+					</p:commandButton>
+
+
+					<p:commandButton icon="ui-icon-pencil" title="Editar"
+						oncomplete="PF('dlgCatEditar').show();"
+						update=":frmCatEditar:pnlCatEditar">
+						<f:setPropertyActionListener target="#{MBCategoria.categoria}"
+							value="#{item}" />
+					</p:commandButton>
+
+				</p:column>
+
+				<!-- 				Botão novo do categoria -->
+				<f:facet name="footer">
+					<p:commandButton value="Novo" icon="ui-icon-document"
+						action="#{MBCategoria.prepararNovo()}"
+						oncomplete="PF('dlgCatNovo').show();" title="Nova: Categoria">
+						<p:resetInput target=":frmCatNovo:pnlCatNovo" />
+					</p:commandButton>
+
+				</f:facet>
+
+			</p:dataTable>
+			
+			<!-- 			imagem que gera a exportação a partir dos dados da tabela -->
+			<h3>Export</h3>
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para pdf"
+					style="height: 30px" value="/imagens/Adobe_PDF_icon.png" />
+				<p:dataExporter encoding="iso-8859-1" type="pdf"
+					target="tblCatListagem" fileName="Categoria" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para excel"
+					style="height: 30px" value="/imagens/excel.png" />
+				<p:dataExporter type="xls" target="tblCatListagem"
+					fileName="Categoria" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para csv"
+					style="height: 30px" value="/imagens/csv.png" />
+				<p:dataExporter type="csv" target="tblCatListagem"
+					fileName="Categoria" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para xml"
+					style="height: 30px" value="/imagens/xml.png" />
+				<p:dataExporter type="xml" target="tblCatListagem"
+					fileName="Categoria" />
+			</p:commandLink>
+		</h:form>
+
+		<p:dialog widgetVar="dlgCatNovo" closable="true" draggable="false"
+			resizable="false" header="Categoria - Novo" appendTo="@(body)"
+			modal="true">
+			<h:form id="frmCatNovo">
+				<h:panelGrid id="pnlCatNovo" columns="2">
+					<p:outputLabel for="descricaoo" value="Descricao: *" />
+					<p:inputText id="descricaoo"
+						value="#{MBCategoria.categoria.descricao}" size="50"
+						maxlength="40" title="Digite a descrição da categoria" />
+
+				</h:panelGrid>
+				<br />
+				<font color="red"> <h:outputText value="*" />
+				</font>
+				<h:outputLabel value="Indica campo requerido" />
+				
+				<center>
+
+					<p:commandButton value="Salvar" icon="ui-icon-check"
+						actionListener="#{MBCategoria.salvar}"
+						oncomplete="verificar2(xhr, status, args, 'dlgCatNovo', 'tabelaCatListagem' )"
+						update=":frmCatListagem:tblCatListagem :frmCatNovo :msgGlobal" />
+
+					<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+						oncomplete="PF('dlgCatNovo').hide();" ajax="true">
+
+					</p:commandButton>
+
+				</center>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgCatEditar" closable="true" draggable="false"
+			resizable="false" header="Categoria - Editar" appendTo="@(body)"
+			modal="true">
+			<h:form id="frmCatEditar">
+				<h:panelGrid id="pnlCatEditar" columns="2">
+					<p:outputLabel for="descricaoo" value="Descricao: *" />
+					<p:inputText id="descricaoo"
+						value="#{MBCategoria.categoria.descricao}" size="50"
+						maxlength="40" title="Digite a descrição da categoria" />
+
+				</h:panelGrid>
+				
+				<br />
+				<font color="red"> <h:outputText value="*" />
+				</font>
+				<h:outputLabel value="Indica campo requerido" />
+				<center>
+
+					<p:commandButton value="Editar" icon="ui-icon-check"
+						actionListener="#{MBCategoria.editar}"
+						oncomplete="verificar(xhr, status, args, 'dlgCatEditar', 'tabelaCatListagem' )"
+						update=":frmCatListagem:tblCatListagem :frmCatEditar :msgGlobal" />
+
+					<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+						oncomplete="PF('dlgCatEditar').hide();" ajax="true">
+
+					</p:commandButton>
+
+				</center>
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgCatExcluir" closable="true" draggable="false"
+			resizable="false" header="Categoria - Excluir" appendTo="@(body)"
+			modal="true">
+			<h:form id="frmCatExcluir">
+				<h:panelGrid id="pnlCatExcluir" columns="2">
+					<p:outputLabel value="Descricao:" />
+					<p:outputLabel value="#{MBCategoria.categoria.descricao}" size="50"
+						maxlength="40" title="Digite a descrição da categoria" />
+
+				</h:panelGrid>
+
+				<center>
+
+					<p:commandButton value="Excluir" icon="ui-icon-check"
+						actionListener="#{MBCategoria.excluir}"
+						oncomplete="verificar(xhr, status, args, 'dlgCatExcluir', 'tabelaCatListagem')"
+						update=":frmCatListagem:tblCatListagem :frmCatExcluir :msgGlobal" />
+
+					<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+						oncomplete="PF('dlgCatExcluir').hide();" ajax="true">
+
+					</p:commandButton>
+
+				</center>
+			</h:form>
+		</p:dialog>
+
+
+	</ui:define>
+
+</ui:composition>

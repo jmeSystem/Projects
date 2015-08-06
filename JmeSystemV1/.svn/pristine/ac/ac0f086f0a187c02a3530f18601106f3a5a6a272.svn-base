@@ -1,0 +1,70 @@
+package br.com.jmesystemv1.test;
+
+import java.util.Date;
+import java.util.List;
+
+import br.com.jmesystemv1.dao.JmeClienteDAO;
+import br.com.jmesystemv1.domain.JmeCidade;
+import br.com.jmesystemv1.domain.JmeCliente;
+
+public class JmeClienteTest {
+
+	public static void main(String[] args) {
+
+		JmeClienteDAO dao = new JmeClienteDAO();
+		JmeCidade cid = new JmeCidade();
+		JmeCliente cliente = new JmeCliente();
+
+		//salvar
+		//		cid.setIdCidade(1);
+//
+	
+//
+//		cliente.setCidade(cid);
+//		cliente.setCpf("1234");
+//		cliente.setDataCadastro(new Date());
+//		cliente.setDataNascimento(new Date());
+//		cliente.setEndereco("Rua Waldomiro");
+//		cliente.setInforComplementar("Trabalh");
+//		cliente.setNome("Mário Octávio Bu");
+//		cliente.setTelefone("43353");
+//		cliente.setTelefoneTrabalho("4335");
+//
+//		dao.salvar(cliente);
+		
+		
+		// listar por codigo
+//		JmeCliente cliente = dao.buscarPorCodigo(12);
+//		
+//		System.out.println(cliente);
+		
+		
+//		listar tudo
+//		List<JmeCliente> clientes = dao.listar();
+//		for(JmeCliente cliente : clientes ){
+//		System.out.println(cliente);
+		
+//		}
+		
+//		// Editar, toda vez que for editar tem que fazer a busca primeiro
+//		JmeCliente clientes = dao.buscarPorCodigo(13);
+//		cid.setIdCidade(2);
+//		clientes.setCidade(cid);
+//		clientes.setCpf("1234");
+//		clientes.setDataCadastro(new Date());
+//		clientes.setDataNascimento(new Date());
+//		clientes.setEndereco("Rua Waldomiro");
+//		clientes.setInforComplementar("Trabalha");
+//		clientes.setNome("Olivia");
+//		clientes.setTelefone("43353");
+//		clientes.setTelefoneTrabalho("4335");
+//		
+//		dao.editar(clientes);
+		
+//		// excluir
+//		dao.excluir(12);
+		
+		
+	}
+
+}

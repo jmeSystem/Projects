@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/jmeModeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/jmeMenuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<f:event listener="#{MBParcelasVencidas.listarParcelasVencidas()}"
+			type="preRenderView" />
+
+		<h:form id="frmParcelasVencidas">
+			<p:dataTable id="tblParcelasVencidas" var="item"
+				emptyMessage="Nenhum registro encontrado"
+				widgetVar="tabelaParcelasVencidas" paginator="true" rows="10"
+				value="#{MBParcelasVencidas.listagemParcelasVencidas}">
+
+				<f:facet name="header">
+					<h:outputText value="Parcelas Vencidas - Listagem" />
+				</f:facet>
+
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="Data de Vencimento" />
+					</f:facet>
+					<h:outputText value="#{item.dataVencimento}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="Cliente"/>
+					</f:facet>
+					<h:outputText value="#{item.registroVenda.cliente.nome}" />
+				</p:column>
+
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="Telefone"/>
+					</f:facet>
+					<h:outputText value="#{item.registroVenda.cliente.telefone}" />
+				</p:column>
+				
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="Valor Parcela"/>
+					</f:facet>
+					<h:outputText value="#{item.valor}" />
+				</p:column>
+
+				<p:column exportable="false" headerText="Situação">
+					<h:outputText value="#{item.situacao}"
+						styleClass="#{item.situacao=='Pendente' ? 'linhaEstiloPendente' : 'linhaEstiloPago'}" />
+				</p:column>
+
+				<p:column exportable="false" headerText="Número Parcela">
+					<h:outputText value="#{item.numeroParcela}" />
+				</p:column>
+
+
+
+			</p:dataTable>
+			
+			
+			<!-- 			imagem que gera a exportação a partir dos dados da tabela -->
+			<h3>Export</h3>
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para pdf"
+					style="height: 30px" value="/imagens/Adobe_PDF_icon.png" />
+				<p:dataExporter encoding="iso-8859-1" type="pdf"
+					target="tblParcelasVencidas" fileName="Parcelas Vencidas" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para excel"
+					style="height: 30px" value="/imagens/excel.png" />
+				<p:dataExporter type="xls" target="tblParcelasVencidas"
+					fileName="Parcelas Vencidas" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para csv"
+					style="height: 30px" value="/imagens/csv.png" />
+				<p:dataExporter type="csv" target="tblParcelasVencidas"
+					fileName="Parcelas Vencidas" />
+			</p:commandLink>
+
+			<p:commandLink ajax="false">
+				<p:graphicImage title="Exportar o resultado para xml"
+					style="height: 30px" value="/imagens/xml.png" />
+				<p:dataExporter type="xml" target="tblParcelasVencidas"
+					fileName="Parcelas Vencidas" />
+			</p:commandLink>
+
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

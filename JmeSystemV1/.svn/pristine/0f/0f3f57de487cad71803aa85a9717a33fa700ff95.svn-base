@@ -1,0 +1,598 @@
+package br.com.jmesystemv1.bean;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+
+import br.com.jmesystemv1.dao.JmeClienteDAO;
+import br.com.jmesystemv1.dao.JmeFormaPagamentoDAO;
+import br.com.jmesystemv1.dao.JmeFuncionarioDAO;
+import br.com.jmesystemv1.dao.JmeItensVendaDAO;
+import br.com.jmesystemv1.dao.JmePagamentoDAO;
+import br.com.jmesystemv1.dao.JmeParcelaDAO;
+import br.com.jmesystemv1.dao.JmeProdutoDAO;
+import br.com.jmesystemv1.dao.JmeRegistroVendasDAO;
+import br.com.jmesystemv1.domain.JmeCliente;
+import br.com.jmesystemv1.domain.JmeFormaPagamento;
+import br.com.jmesystemv1.domain.JmeFuncionario;
+import br.com.jmesystemv1.domain.JmeItensVenda;
+import br.com.jmesystemv1.domain.JmePagamento;
+import br.com.jmesystemv1.domain.JmeParcela;
+import br.com.jmesystemv1.domain.JmeProduto;
+import br.com.jmesystemv1.domain.JmeRegistroVendas;
+import br.com.jmesystemv1.util.JSFUtil;
+
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.FlowEvent;
+
+@ManagedBean(name = "MBRegistroVenda")
+@ViewScoped
+public class JmeRegistroVendaBean implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	// ARMAZANA OS PRODUTOS FILTRADOS
+	private List<JmeProduto> itensFiltrados;
+
+	// LISTAGEM DE TODOS OS PRODUTOS
+	private List<JmeProduto> listaProdutos;
+
+	private Integer controlador=0;
+	
+	// Responsavel por limitar a quantidade de parcela, de acordo com a forma de pagamento escolhido
+	private Integer quantidadeParcela;
+	
+	// ARMAZENA OS FUNCIONARIOS CADASTRADOS
+	private List<JmeFuncionario> comboFuncionario;
+
+	// ARMAZENA OS CLIENTES CADASTRADOS
+	private List<JmeCliente> comboCliente;
+
+	// ARMAZENA AS FORMAS DE PAGAMENTO
+	private List<JmeFormaPagamento> comboPagamento;
+
+	private JmeParcela parcela = new JmeParcela();
+	//Objeto Pagamento
+	private JmePagamento pagamento = new JmePagamento();
+
+	private boolean skip;
+	
+	private Double desconto = 0.0;
+
+	private Double acrescimo = 0.0;
+	
+	
+	private Double valorDescontoAcrescimo = 0.0;
+
+	private int tipoAcrescimo;
+	// Será responsavel para guarda a venda que eu estou realizando
+	private JmeRegistroVendas vendaCadastro;
+
+	private List<JmeItensVenda> listaItens;
+
+	/* =======================GET-SET================= */
+	
+	
+	
+	
+	public boolean isSkip() {
+		return skip;
+	}
+
+	public JmeParcela getParcela() {
+		return parcela;
+	}
+
+	public void setParcela(JmeParcela parcela) {
+		this.parcela = parcela;
+	}
+
+	public Integer getControlador() {
+		return controlador;
+	}
+
+	public void setControlador(Integer controlador) {
+		this.controlador = controlador;
+	}
+
+	public Integer getQuantidadeParcela() {
+		return quantidadeParcela;
+	}
+
+	public void setQuantidadeParcela(Integer quantidadeParcela) {
+		this.quantidadeParcela = quantidadeParcela;
+	}
+
+	public Double getValorDescontoAcrescimo() {
+		return valorDescontoAcrescimo;
+	}
+
+	public void setValorDescontoAcrescimo(Double valorDescontoAcrescimo) {
+		this.valorDescontoAcrescimo = valorDescontoAcrescimo;
+	}
+
+	public int getTipoAcrescimo() {
+		return tipoAcrescimo;
+	}
+
+	public void setTipoAcrescimo(int tipoAcrescimo) {
+		this.tipoAcrescimo = tipoAcrescimo;
+	}
+
+	public Double getDesconto() {
+		return desconto;
+	}
+
+	public void setDesconto(Double desconto) {
+		this.desconto = desconto;
+	}
+
+	public Double getAcrescimo() {
+		return acrescimo;
+	}
+
+	public void setAcrescimo(Double acrescimo) {
+		this.acrescimo = acrescimo;
+	}
+
+	public JmePagamento getPagamento() {
+		return pagamento;
+	}
+
+	public void setPagamento(JmePagamento pagamento) {
+		this.pagamento = pagamento;
+	}
+
+	public List<JmeFormaPagamento> getComboPagamento() {
+		return comboPagamento;
+	}
+
+	public void setComboPagamento(List<JmeFormaPagamento> comboPagamento) {
+		this.comboPagamento = comboPagamento;
+	}
+
+	public void setSkip(boolean skip) {
+		this.skip = skip;
+	}
+
+	public List<JmeProduto> getListaProdutos() {
+		return listaProdutos;
+	}
+
+	public List<JmeProduto> getItensFiltrados() {
+		return itensFiltrados;
+	}
+
+	public void setItensFiltrados(List<JmeProduto> itensFiltrados) {
+		this.itensFiltrados = itensFiltrados;
+	}
+
+	public void setListaProdutos(List<JmeProduto> listaProdutos) {
+		this.listaProdutos = listaProdutos;
+	}
+
+	public List<JmeItensVenda> getListaItens() {
+		if (listaItens == null) {
+			listaItens = new ArrayList<JmeItensVenda>();
+			System.out.println("passou");
+		}
+
+		return listaItens;
+	}
+
+	public void setListaItens(List<JmeItensVenda> listaItens) {
+		this.listaItens = listaItens;
+	}
+
+	public List<JmeFuncionario> getComboFuncionario() {
+		return comboFuncionario;
+	}
+
+	public void setComboFuncionario(List<JmeFuncionario> comboFuncionario) {
+		this.comboFuncionario = comboFuncionario;
+	}
+
+	public List<JmeCliente> getComboCliente() {
+		return comboCliente;
+	}
+
+	public void setComboCliente(List<JmeCliente> comboCliente) {
+		this.comboCliente = comboCliente;
+	}
+
+	public JmeRegistroVendas getVendaCadastro() {
+
+		if (vendaCadastro == null) {
+			vendaCadastro = new JmeRegistroVendas();
+			vendaCadastro.setValorTotal(0.00);
+			pagamento.setNumeroParcelas(0);
+		}
+		return vendaCadastro;
+	}
+
+	public void setVendaCadastro(JmeRegistroVendas vendaCadastro) {
+		this.vendaCadastro = vendaCadastro;
+	}
+
+	/* =======================METODOS================= */
+
+	public void calcularDesconto() {
+		 
+			
+		if (valorDescontoAcrescimo == null || valorDescontoAcrescimo == 0.0) {
+			valorDescontoAcrescimo = 0.0;
+			desconto = 0.0;
+			acrescimo = 0.0;
+			pagamento.setValorPagamento(vendaCadastro.getValorTotal());
+
+		} else if (valorDescontoAcrescimo < 0) {
+			JSFUtil.adicionarMensagemErro("valor tem que ser maior que 0!");
+		}
+
+		if (tipoAcrescimo == 0 && valorDescontoAcrescimo != 0) {
+
+			desconto = valorDescontoAcrescimo;
+			acrescimo = 0.0;
+			pagamento.setValorPagamento((vendaCadastro.getValorTotal())
+					- (vendaCadastro.getValorTotal() * desconto) / 100);
+			System.out.println("Passou no desconto"
+					+ pagamento.getValorPagamento());
+
+		} else if (tipoAcrescimo == 1 && valorDescontoAcrescimo != 0) {
+			acrescimo = valorDescontoAcrescimo;
+			desconto = 0.0;
+			pagamento.setValorPagamento((vendaCadastro.getValorTotal())
+					+ (vendaCadastro.getValorTotal() * acrescimo) / 100);
+			System.out.println("Passou no acrescimo"
+					+ pagamento.getValorPagamento());
+		}
+
+	}
+
+	/**
+	 * Método responsavel por listar todos os produtos cadastrados
+	 */
+	public void listar() {
+		JmeProdutoDAO dao = new JmeProdutoDAO();
+
+		try {
+
+			listaProdutos = new ArrayList<JmeProduto>();
+
+			listaProdutos = dao.listar();
+
+		} catch (Exception e) {
+			JSFUtil.adicionarMensagemErro("Erro ao listar Pordutos!");
+		}
+	}
+
+	// metodo responsavel por adicionar o produto na tabela de itens
+	public void adicionarProduto(JmeProduto produto) {
+		
+		// porque -1, quando não achar nenhum item corresponde ao produto, pois
+		// não achei nenhum produto.
+		int posicaoEncontrada = -1;
+
+		// posicaoEncontrada<0 que dizer que percorre o vetor até achar o
+		// objeto, se achou para o for de executar
+		for (int pos = 0; pos < listaItens.size() && posicaoEncontrada < 0; pos++) {
+			// vai capturar o item de acordo com a sua posição dentro da lista 
+			JmeItensVenda itemTemporario = listaItens.get(pos);
+
+			// se o produto do item é igual a produto que veio como paramentro
+			if (itemTemporario.getProduto().equals(produto)) {
+				
+				
+				posicaoEncontrada = pos;
+			}
+		}
+
+		JmeItensVenda itens = new JmeItensVenda();
+		itens.setProduto(produto);
+
+		if (produto.getQuantEstoque() == 0) {
+			JSFUtil.adicionarMensagemErro(produto.getDescricao() + " - "
+					+ "Saldo indisponível.");
+
+			// caso não foi encontrado nenhum produto na lista do item, adiciona
+			// um
+			// novo produto
+		} else if (posicaoEncontrada < 0) {
+			itens.setValorUnitario(produto.getValorUnitario());
+			itens.setQuantidade(1);
+			itens.setValorTotalItens(produto.getValorUnitario());
+			listaItens.add(itens);
+
+			// Soma os valores dos itens
+			vendaCadastro.setValorTotal(vendaCadastro.getValorTotal()
+					+ (produto.getValorUnitario()));
+			pagamento.setValorPagamento(vendaCadastro.getValorTotal());
+			
+			parcela.setValor(0.0);
+			
+			System.out.println("parcela"+parcela.getValor());
+			// responsalvel por carregar os combobox da forma de pagamento
+			this.carregarDadosVenda();
+
+			// se achou um produto já na lista do item, soma a quantidade e
+			// mutiplica o valor parcial
+		} else {
+
+			// vai pegar o item que foi encontrado no for.
+			JmeItensVenda itemTemp = listaItens.get(posicaoEncontrada);
+			System.out.println("achou produto igual");
+			
+			if(itemTemp.getQuantidade()==produto.getQuantEstoque()){
+				JSFUtil.adicionarMensagemErro("Impossivel adicionar, quantidade de estoque indisponivel");
+				return;
+				
+			}
+			itens.setQuantidade(itemTemp.getQuantidade() + 1);
+			itens.setValorTotalItens(produto.getValorUnitario()
+					* (itens.getQuantidade()));
+
+			listaItens.set(posicaoEncontrada, itens);
+
+			// Soma os valores dos itens
+			vendaCadastro.setValorTotal(vendaCadastro.getValorTotal()
+					+ (produto.getValorUnitario()));
+			pagamento.setValorPagamento(vendaCadastro.getValorTotal());
+
+			parcela.setValor(0.0);
+			System.out.println(parcela.getValor());
+			// responsalvel por carregar os combobox da forma de pagamento
+			this.carregarDadosVenda();
+
+		}
+	}
+
+	// metodo responsavel por excluir um item da tabela de item
+	public void removerItem(JmeItensVenda item) {
+
+		int posicaoEncontrada = -1;
+
+		for (int pos = 0; pos < listaItens.size() && posicaoEncontrada < 0; pos++) {
+			JmeItensVenda itemTemp = listaItens.get(pos);
+
+			if (itemTemp.getProduto().equals(item.getProduto())) {
+				posicaoEncontrada = pos;
+			}
+		}
+		if (posicaoEncontrada > -1) {
+
+			listaItens.remove(posicaoEncontrada);
+			vendaCadastro.setValorTotal(vendaCadastro.getValorTotal()
+					- item.getValorTotalItens());
+		}
+
+	}
+
+	// METODO RESPONSAVEL POR EDITAR UM ITEM
+	public void editarItem(JmeItensVenda item) {
+		
+		if(item.getQuantidade()>item.getProduto().getQuantEstoque()){
+			System.out.println("passou quantidade");
+			item.setQuantidade(1);
+			JSFUtil.adicionarMensagemErro("Saldo indisponivel");
+			return;
+		}
+		
+		// // porque -1, quando não achar nenhum item corresponde ao produto,
+		// pois não achei nenhum produto.
+		int posicaoEncontrada = 0;
+
+		// posicaoEncontrada<0 que dizer que percorre o vetor até achar o
+		// objeto, se achou para o for de executar
+		for (int pos = 0; pos < listaItens.size(); pos++) {
+			// vai capturar o item de acordo com a sua posição dentro do vetor
+			JmeItensVenda itemTemporario = listaItens.get(pos);
+			
+			
+			// se o produto do item é igual a produto que veio como paramentro
+			if (itemTemporario.getProduto().equals(item.getProduto())) {
+				posicaoEncontrada = pos;	
+				
+				System.out.println("passou no if");
+				
+			}
+		}
+		
+		JmeItensVenda editar = new JmeItensVenda();
+
+		JmeItensVenda itemTemp = listaItens.get(posicaoEncontrada);
+		
+		
+		//atribui o obejto produto
+		editar.setProduto(item.getProduto());
+		// pega a nova quantidade digitada
+		editar.setQuantidade(itemTemp.getQuantidade());
+
+		
+		editar.setValorUnitario(itemTemp.getValorUnitario());
+		
+		editar.setValorTotalItens(itemTemp.getValorUnitario() * (editar.getQuantidade()));
+
+		// set, os novos valores na listaItens
+		listaItens.set(posicaoEncontrada, editar);
+		
+		// Variavel responsavel por receber os valores totalItens, (com a somatória de todos os produtos dentro da lista)
+		double valor=0.0;
+		
+		// percorre toda a lista de itens, pega os valoresTotal de cada itens e depois armazena na variavel valor
+		for(JmeItensVenda valorTotalItens : listaItens){
+			
+			valor= valor + valorTotalItens.getValorTotalItens();
+			System.out.println(valor);
+		}
+		
+		JSFUtil.adicionarMensagemSucesso("Quantidade Alterada: "+editar.getQuantidade());
+		// Valor Total de Itens
+			vendaCadastro.setValorTotal(valor);
+
+	}
+
+	// metodo responsalvel para carregar o combobox do cliente e do funcionario.
+	public void carregarDadosVenda() {
+		if (comboCliente == null || comboFuncionario == null
+				|| comboPagamento == null) {
+
+			vendaCadastro.setDataVenda(new Date());
+			vendaCadastro.setDataVencimento(new Date());
+
+			JmeClienteDAO clienteDAO = new JmeClienteDAO();
+			comboCliente = clienteDAO.listar();
+
+			JmeFormaPagamentoDAO dao = new JmeFormaPagamentoDAO();
+
+			comboPagamento = dao.listar();
+
+			System.out.println(comboPagamento);
+			JmeFuncionarioDAO funcionarioDAO = new JmeFuncionarioDAO();
+
+			comboFuncionario = funcionarioDAO.listar();
+		}
+
+	}
+
+	// Metodo responsalvel por registrar a venda e inclusão dos itens
+	public void salvar() {
+		try {
+
+			JmeRegistroVendasDAO vendaDAO = new JmeRegistroVendasDAO();
+
+			// Pegar o codigo da venda
+			Integer codigoVenda = vendaDAO.salvar(vendaCadastro);
+
+			// vendaFK recebe a chave primaria da ultima venda
+			JmeRegistroVendas vendaFK = vendaDAO.buscarPorCodigo(codigoVenda);
+
+			for (JmeItensVenda item : listaItens) {
+				item.setRegistroVendas(vendaFK);
+				JmeItensVendaDAO itemDAO = new JmeItensVendaDAO();
+				itemDAO.salvar(item);
+			}
+
+			JmePagamentoDAO dao = new JmePagamentoDAO();
+			pagamento.setRegistroVendas(vendaFK);
+			// só para efeito de teste
+			pagamento.setDataPagamento(new Date());
+			dao.salvar(pagamento);
+			
+			int cont=0;
+			JmeParcelaDAO daoParcela = new JmeParcelaDAO();
+			if(pagamento.getNumeroParcelas()<=1){
+				
+			}else{
+			while(cont<pagamento.getNumeroParcelas()){
+				
+				parcela.setRegistroVenda(vendaFK);
+				parcela.setValor(parcela.getValor());
+				
+				daoParcela.salvar(parcela);
+				cont++;
+				
+			}
+			}
+			// Serve para limpar a vendaCadastro
+			vendaCadastro = new JmeRegistroVendas();
+
+			// serve para zerar o valor total da venda
+			vendaCadastro.setValorTotal(0.00);
+
+			// Serve para limpar a tabela de itens
+			listaItens = new ArrayList<JmeItensVenda>();
+
+		} catch (RuntimeException ex) {
+			 JSFUtil.adicionarMensagemErro("Erro tentar salvar a venda");
+		}
+	}
+
+	// Vai receber os valores setados pelos os combox
+	public void confirmacao() {
+
+		
+		
+		
+		JmeFuncionarioDAO daoFuncionario = new JmeFuncionarioDAO();
+		JmeClienteDAO daoCliente = new JmeClienteDAO();
+		JmeFormaPagamentoDAO daoFormaPagamento = new JmeFormaPagamentoDAO();
+		
+		if(pagamento.getFormaPagamento().getIdFormaPagamento()!=null){
+			JmeFormaPagamento formaPagamento = daoFormaPagamento
+					.buscarPorCodigo(pagamento.getFormaPagamento()
+							.getIdFormaPagamento());
+			
+				quantidadeParcela=formaPagamento.getQuantidadeParcela();
+			System.out.println("passou"+quantidadeParcela);
+		}
+		
+		
+		if (vendaCadastro.getCliente().getIdCliente() == null
+				|| vendaCadastro.getFuncionario().getIdFuncionario() == null
+				|| pagamento.getFormaPagamento().getIdFormaPagamento() == null) {
+			System.out.println("Cliente ou funcionario não selecionado");
+			return;
+			
+		}
+		JmeFuncionario funcionario = daoFuncionario
+				.buscarPorCodigo(vendaCadastro.getFuncionario()
+						.getIdFuncionario());
+		System.out.println(funcionario.getNome());
+		vendaCadastro.getFuncionario().setNome(funcionario.getNome());
+
+		JmeCliente cliente = daoCliente.buscarPorCodigo(vendaCadastro
+				.getCliente().getIdCliente());
+		System.out.println(cliente.getNome());
+		vendaCadastro.getCliente().setNome(cliente.getNome());
+
+		JmeFormaPagamento formaPagamento = daoFormaPagamento
+				.buscarPorCodigo(pagamento.getFormaPagamento()
+						.getIdFormaPagamento());
+		
+		System.out.println(formaPagamento.getDescricao());
+		
+		pagamento.getFormaPagamento().setDescricao(
+				formaPagamento.getDescricao());
+		
+		
+		System.out.println("pagamento"+formaPagamento.getQuantidadeParcela());
+		
+		
+		
+	}
+
+	public void cancelarVenda(){
+		JSFUtil.adicionarMensagemErro("Venda Cancelada");
+	}
+	
+	public void calcularParcela(){
+		
+		if(pagamento.getNumeroParcelas()==0){
+			parcela.setValor(0.0);
+			return;
+		}
+		parcela.setValor(vendaCadastro.getValorTotal()/pagamento.getNumeroParcelas());
+		
+		System.out.println(parcela.getValor());
+	}
+	public String handleFlow(FlowEvent event) {
+		
+		String currentStepId = event.getOldStep();
+		String stepToGo = event.getNewStep();
+		
+		
+		
+		if (listaItens.isEmpty()) {
+			JSFUtil.adicionarMensagemErro("Selecione um produto!");
+			RequestContext.getCurrentInstance().update("msgGlobal");
+			return currentStepId;
+		}
+		else {
+			return stepToGo;
+		}
+	}
+	
+}

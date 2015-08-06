@@ -1,0 +1,7 @@
+@CHARSET "UTF-8";
+
+.linhaEstiloAlerta{  
+background-color:#c0c0c0;    
+    color: #ffff00;  
+    font-weight: bold;
+}  
